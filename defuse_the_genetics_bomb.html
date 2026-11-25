@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defuse the Genetics Bomb: ภารกิจกู้ระเบิดพันธุกรรม</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Kanit & Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 65%, #020617 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-kanit {
+            font-family: 'Kanit', sans-serif;
+        }
+        .digital-font {
+            font-family: 'Kanit', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        @keyframes shakeHard {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            15% { transform: translate(-10px, 4px) rotate(-1deg); }
+            30% { transform: translate(10px, -4px) rotate(1deg); }
+            45% { transform: translate(-8px, -3px) rotate(-0.5deg); }
+            60% { transform: translate(8px, 3px) rotate(0.5deg); }
+            75% { transform: translate(-4px, 2px) rotate(0deg); }
+        }
+        .animate-shake-hard {
+            animation: shakeHard 0.45s ease-in-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes floatUpFade {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-36px) scale(1.2); opacity: 0; }
+        }
+        .animate-penalty {
+            animation: floatUpFade 0.9s ease-out forwards;
+        }
+        /* Metallic Bomb Casing Pattern */
+        .bomb-casing {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+        .hazard-stripe {
+            background: repeating-linear-gradient(
+                -45deg,
+                #eab308,
+                #eab308 12px,
+                #18181b 12px,
+                #18181b 24px
+            );
+        }
+        @media print {
+            body {
+                background: white !important;
+                color: #0f172a !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #report-card {
+                background: white !important;
+                color: #0f172a !important;
+                border: 2px solid #cbd5e1 !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between">
+
+    <!-- ================= TOP BAR ================= -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 no-print">
+        <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+                <img src="https://img1.pic.in.th/images/Schl_Logo.jpg" 
+                     onerror="this.src='https://placehold.co/48x48/dc2626/ffffff?text=BTW'" 
+                     alt="โลโก้โรงเรียนบ่อทองวงษ์จันทร์วิทยา" 
+                     class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400 shadow">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-sm sm:text-base font-bold text-white leading-tight">Defuse the Genetics Bomb</h1>
+                        <span class="hidden sm:inline-block bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-semibold px-2 py-0.5 rounded-full">Bio-Hazard Lab</span>
+                    </div>
+                    <p class="text-xs text-slate-400">โรงเรียนบ่อทองวงษ์จันทร์วิทยา • รายวิชาพันธุศาสตร์และวิวัฒนาการ</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button id="btn-abort" onclick="abortToMenu()" class="hidden px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-kanit transition">
+                    <i class="fas fa-arrow-left mr-1"></i>ออกภารกิจ
+                </button>
+                <button onclick="toggleSound()" class="p-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition" title="เปิด/ปิดเสียงเอฟเฟกต์">
+                    <i id="icon-sound" class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= MAIN CONTAINER ================= -->
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6">
+        <div class="w-full max-w-4xl">
+
+            <!-- ================= SCREEN 1: MISSION BRIEFING & LOGIN ================= -->
+            <section id="screen-start" class="bomb-casing rounded-3xl border border-slate-700 overflow-hidden animate-pop">
+                <div class="hazard-stripe h-3 w-full"></div>
+                
+                <div class="p-6 sm:p-8 text-center border-b border-slate-800 relative overflow-hidden">
+                    <i class="fas fa-biohazard absolute -right-6 -bottom-6 text-9xl text-rose-500/10 rotate-12"></i>
+                    <i class="fas fa-dna absolute -left-6 -top-6 text-8xl text-cyan-500/10 -rotate-12"></i>
+
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="bg-white p-1.5 rounded-full shadow-lg mb-3 border-2 border-amber-400">
+                            <img src="https://img1.pic.in.th/images/Schl_Logo.jpg" 
+                                 onerror="this.src='https://placehold.co/96x96/dc2626/ffffff?text=BTW'" 
+                                 alt="โลโก้โรงเรียนบ่อทองวงษ์จันทร์วิทยา" 
+                                 class="w-20 h-20 rounded-full object-cover">
+                        </div>
+                        <span class="bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-kanit font-semibold px-3.5 py-1 rounded-full mb-2">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> ภารกิจกู้ระเบิดเวลาชีวภาพ • โรงเรียนบ่อทองวงษ์จันทร์วิทยา
+                        </span>
+                        <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">Defuse the Genetics Bomb</h1>
+                        <p class="text-sm sm:text-lg text-amber-300 font-kanit mt-0.5">ภารกิจกู้ระเบิดพันธุกรรม</p>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <!-- Rules Box -->
+                    <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-cut"></i>
+                            </div>
+                            <div>
+                                <strong class="text-emerald-300 font-kanit block">1. ตัดสายไฟคำตอบที่ถูก</strong>
+                                <span class="text-slate-400">คำนวณความน่าจะเป็นทางพันธุศาสตร์แล้วกดตัดสายไฟที่มีคำตอบถูกต้อง</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <strong class="text-rose-300 font-kanit block">2. ตัดผิดเวลาลด -10 วิ!</strong>
+                                <span class="text-slate-400">หากตัดสายผิดจะเกิดประกายไฟ เวลาลดทันที 10 วินาที พร้อมคำใบ้ให้แก้ตัว</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div>
+                                <strong class="text-amber-300 font-kanit block">3. สะสมคอมโบความเร็ว</strong>
+                                <span class="text-slate-400">ตัดถูกต่อเนื่องรับโบนัสคะแนน Combo และโบนัสเวลาที่เหลือ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Form -->
+                    <form id="briefing-form" onsubmit="startMission(event)" class="space-y-5">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-kanit font-semibold text-base text-slate-200">ข้อมูลเจ้าหน้าที่กู้ระเบิด (นักเรียน)</h3>
+                            <button type="button" onclick="fillDemoStudent()" class="text-xs text-cyan-400 hover:text-cyan-300 underline">
+                                <i class="fas fa-magic mr-1"></i>กรอกข้อมูลทดลองเล่นด่วน
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-6">
+                                <label class="block text-xs text-slate-400 mb-1">ชื่อ - นามสกุล <span class="text-rose-400">*</span></label>
+                                <input type="text" id="input-name" required placeholder="เช่น นายธนกฤต วงศ์สุวรรณ" 
+                                       class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none text-sm">
+                            </div>
+                            <div class="sm:col-span-4">
+                                <label class="block text-xs text-slate-400 mb-1">ชั้น / ห้อง <span class="text-rose-400">*</span></label>
+                                <select id="input-class" required class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:border-amber-400 outline-none text-sm">
+                                    <option value="" disabled selected>-- เลือกห้อง --</option>
+                                    <optgroup label="มัธยมศึกษาปีที่ 4">
+                                        <option value="ม.4/1">ม.4/1</option>
+                                        <option value="ม.4/2">ม.4/2</option>
+                                        <option value="ม.4/3">ม.4/3</option>
+                                        <option value="ม.4/4">ม.4/4</option>
+                                    </optgroup>
+                                    <optgroup label="มัธยมศึกษาปีที่ 5">
+                                        <option value="ม.5/1">ม.5/1</option>
+                                        <option value="ม.5/2">ม.5/2</option>
+                                        <option value="ม.5/3">ม.5/3</option>
+                                        <option value="ม.5/4">ม.5/4</option>
+                                    </optgroup>
+                                    <optgroup label="มัธยมศึกษาปีที่ 6">
+                                        <option value="ม.6/1">ม.6/1</option>
+                                        <option value="ม.6/2">ม.6/2</option>
+                                        <option value="ม.6/3">ม.6/3</option>
+                                        <option value="ม.6/4">ม.6/4</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs text-slate-400 mb-1">เลขที่ <span class="text-rose-400">*</span></label>
+                                <input type="number" id="input-no" required min="1" max="60" placeholder="1" 
+                                       class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:border-amber-400 outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Difficulty Selector -->
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2">เลือกระดับความท้าทายของภารกิจ</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="difficulty" value="normal" checked class="peer hidden">
+                                    <div class="p-4 rounded-2xl bg-slate-900 border-2 border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-950/40 transition flex items-center justify-between">
+                                        <div>
+                                            <span class="font-kanit font-bold text-base text-emerald-400 block">ระดับปกติ (Standard Agent)</span>
+                                            <span class="text-xs text-slate-400">เวลา 60 วินาที • กู้ระเบิด 8 ข้อ</span>
+                                        </div>
+                                        <i class="fas fa-shield-alt text-2xl text-emerald-500"></i>
+                                    </div>
+                                </label>
+
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="difficulty" value="expert" class="peer hidden">
+                                    <div class="p-4 rounded-2xl bg-slate-900 border-2 border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-950/40 transition flex items-center justify-between">
+                                        <div>
+                                            <span class="font-kanit font-bold text-base text-rose-400 block">ระดับผู้เชี่ยวชาญ (Elite Expert)</span>
+                                            <span class="text-xs text-slate-400">เวลา 45 วินาที • กู้ระเบิด 10 ข้อ</span>
+                                        </div>
+                                        <i class="fas fa-fire-alt text-2xl text-rose-500"></i>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-kanit font-bold text-lg rounded-2xl shadow-lg shadow-rose-950/50 transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                            <i class="fas fa-bomb"></i>
+                            <span>เริ่มปฏิบัติการกู้ระเบิด!</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= SCREEN 2: BOMB DEFUSAL CONSOLE ================= -->
+            <section id="screen-game" class="hidden animate-pop">
+                <div id="bomb-device" class="bomb-casing rounded-3xl border-2 border-slate-700 overflow-hidden relative">
+                    <div class="hazard-stripe h-3 w-full"></div>
+
+                    <!-- Top Digital HUD -->
+                    <div class="bg-slate-950/90 p-4 sm:px-6 border-b border-slate-800 grid grid-cols-12 items-center gap-3">
+                        <!-- Left: Progress -->
+                        <div class="col-span-5 sm:col-span-4">
+                            <span class="text-[11px] uppercase tracking-wider text-slate-400 block">สถานะการปลดชนวน</span>
+                            <div class="flex items-baseline space-x-1.5">
+                                <span id="hud-q-num" class="text-xl sm:text-2xl font-kanit font-bold text-cyan-400">1</span>
+                                <span class="text-xs text-slate-400">/ <span id="hud-q-total">8</span> จุด</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full mt-1.5 overflow-hidden">
+                                <div id="hud-progress-bar" class="bg-gradient-to-r from-cyan-400 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Center: Digital Countdown Clock -->
+                        <div class="col-span-7 sm:col-span-4 flex justify-end sm:justify-center relative">
+                            <div id="timer-box" class="bg-black border-2 border-emerald-500/60 rounded-2xl px-4 py-2 text-center shadow-inner min-w-[135px] sm:min-w-[160px] relative">
+                                <span class="text-[10px] uppercase tracking-widest text-slate-500 block">TIME REMAINING</span>
+                                <div id="hud-timer" class="digital-font text-3xl sm:text-4xl font-bold text-emerald-400 tracking-wider">60.0</div>
+                                <!-- Floating Penalty Popup Anchor -->
+                                <div id="penalty-anchor" class="absolute -top-2 right-2 pointer-events-none"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Score & Combo -->
+                        <div class="col-span-12 sm:col-span-4 flex sm:flex-col justify-between sm:items-end border-t sm:border-t-0 border-slate-800 pt-2 sm:pt-0">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-slate-400">คะแนน:</span>
+                                <span id="hud-score" class="font-kanit font-bold text-lg sm:text-xl text-amber-400">0</span>
+                            </div>
+                            <div id="hud-combo-badge" class="text-xs font-kanit font-semibold text-slate-400">
+                                คอมโบ: <span id="hud-combo" class="text-cyan-300">0</span>x
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Screen Display -->
+                    <div class="p-4 sm:p-6">
+                        <div class="bg-slate-900/95 border-2 border-cyan-500/30 rounded-2xl p-4 sm:p-6 shadow-inner relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <span id="q-category-tag" class="bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-xs font-kanit px-2.5 py-0.5 rounded-lg">หมวดหมู่</span>
+                                <span class="text-xs text-slate-500"><i class="fas fa-microchip mr-1"></i>วิเคราะห์รหัสพันธุกรรม</span>
+                            </div>
+                            <h2 id="q-text" class="text-base sm:text-xl font-kanit font-medium text-white leading-relaxed">
+                                โจทย์คำถามจะปรากฏที่นี่
+                            </h2>
+                        </div>
+
+                        <!-- Live Feedback Banner (Correct or Wrong Hint) -->
+                        <div id="live-feedback" class="hidden mt-3 rounded-2xl p-3.5 text-xs sm:text-sm font-medium flex items-start space-x-2.5 transition-all">
+                            <i id="live-feedback-icon" class="text-lg mt-0.5"></i>
+                            <div id="live-feedback-msg"></div>
+                        </div>
+
+                        <!-- 4 COLORED WIRES PANEL -->
+                        <div class="mt-5 space-y-3">
+                            <p class="text-xs text-center text-slate-400 font-kanit">
+                                <i class="fas fa-cut text-amber-400 mr-1"></i> คลิกที่ป้ายคำตอบบนสายไฟเพื่อ <strong>ตัดสายไฟ</strong> ที่ถูกต้อง
+                            </p>
+                            <div id="wires-container" class="space-y-3">
+                                <!-- 4 Wires injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hazard-stripe h-3 w-full"></div>
+                </div>
+            </section>
+
+            <!-- ================= SCREEN 3: MISSION DEBRIEF & REPORT CARD ================= -->
+            <section id="screen-report" class="hidden animate-pop">
+                <div id="report-card" class="bomb-casing rounded-3xl border-2 border-slate-700 overflow-hidden">
+                    <!-- Banner -->
+                    <div id="report-banner" class="p-6 sm:p-8 text-center text-white relative overflow-hidden bg-gradient-to-r from-emerald-700 to-teal-800">
+                        <div id="report-icon-circle" class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 id="report-status-title" class="text-2xl sm:text-3xl font-bold">กู้ระเบิดสำเร็จ! ภารกิจลุล่วง</h2>
+                        <p id="report-student-meta" class="text-sm text-white/90 mt-1">เจ้าหน้าที่: -</p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-6">
+                        <!-- 4 Summary Metrics -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3.5">
+                                <span class="text-xs text-slate-400 block">คะแนนรวมสุทธิ</span>
+                                <strong id="rep-score" class="text-2xl sm:text-3xl font-kanit font-bold text-amber-400 mt-1 block">0</strong>
+                            </div>
+                            <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3.5">
+                                <span class="text-xs text-slate-400 block">ความแม่นยำ</span>
+                                <strong id="rep-accuracy" class="text-2xl sm:text-3xl font-kanit font-bold text-emerald-400 mt-1 block">0%</strong>
+                            </div>
+                            <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3.5">
+                                <span class="text-xs text-slate-400 block">เวลาที่เหลือ</span>
+                                <strong id="rep-time-left" class="text-2xl sm:text-3xl font-kanit font-bold text-cyan-400 mt-1 block">0.0 วิ</strong>
+                            </div>
+                            <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3.5">
+                                <span class="text-xs text-slate-400 block">คอมโบสูงสุด</span>
+                                <strong id="rep-max-combo" class="text-2xl sm:text-3xl font-kanit font-bold text-purple-400 mt-1 block">0x</strong>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Review Table -->
+                        <div>
+                            <h3 class="font-kanit font-semibold text-base sm:text-lg mb-3 flex items-center text-amber-300">
+                                <i class="fas fa-clipboard-list mr-2"></i> บันทึกการปฏิบัติการและเฉลยทบทวนรายข้อ
+                            </h3>
+                            <div class="overflow-x-auto rounded-2xl border border-slate-700 max-h-96 overflow-y-auto">
+                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                    <thead class="bg-slate-950 text-slate-300 font-kanit sticky top-0">
+                                        <tr>
+                                            <th class="py-3 px-3 w-12 text-center">ข้อ</th>
+                                            <th class="py-3 px-3 min-w-[200px]">โจทย์ปัญหาพันธุศาสตร์</th>
+                                            <th class="py-3 px-3 min-w-[120px]">คำตอบที่ถูก</th>
+                                            <th class="py-3 px-3 min-w-[200px]">แนวคิดและคำอธิบาย</th>
+                                            <th class="py-3 px-3 text-center w-24">สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rep-table-body" class="divide-y divide-slate-800 bg-slate-900/80">
+                                        <!-- Rows injected via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2 no-print">
+                            <button onclick="replaySameSettings()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-kanit font-bold rounded-2xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <i class="fas fa-redo"></i>
+                                <span>เล่นอีกครั้ง (สุ่มโจทย์ชุดใหม่)</span>
+                            </button>
+                            <button onclick="window.print()" class="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-kanit font-bold rounded-2xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <i class="fas fa-print"></i>
+                                <span>พิมพ์ / บันทึกใบรายงานผล (PDF)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950/90 border-t border-slate-800 py-3 px-4 text-center text-xs text-slate-500 no-print">
+        Defuse the Genetics Bomb • สื่อการสอนเชิงรุกรายวิชาชีววิทยา โรงเรียนบ่อทองวงษ์จันทร์วิทยา
+    </footer>
+
+    <!-- ================= JAVASCRIPT GAME ENGINE ================= -->
+    <script>
+        // ==========================================
+        // 1. WEB AUDIO API SOUND EFFECTS
+        // ==========================================
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('icon-sound').className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute text-slate-500';
+        }
+
+        function playSfx(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(900, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'snip_ok') {
+                    // Snip + positive chime
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.setValueAtTime(920, now + 0.07);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+                } else if (type === 'snip_wrong') {
+                    // Electric spark / buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(75, now + 0.3);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+                    osc.start(now);
+                    osc.stop(now + 0.32);
+                } else if (type === 'win') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.09);
+                        g.gain.setValueAtTime(0.18, now + i * 0.09);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.28);
+                        o.start(now + i * 0.09);
+                        o.stop(now + i * 0.09 + 0.28);
+                    });
+                } else if (type === 'boom') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(110, now);
+                    osc.frequency.exponentialRampToValueAtTime(28, now + 0.65);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                    osc.start(now);
+                    osc.stop(now + 0.7);
+                }
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // 2. QUESTION POOL (18 GENETICS QUESTIONS)
+        // ==========================================
+        const QUESTION_POOL = [
+            {
+                cat: "กฎข้อที่ 1 ของเมนเดล",
+                q: "พ่อมีจีโนไทป์ Aa และแม่มีจีโนไทป์ aa โอกาสที่จะได้ลูกที่มีจีโนไทป์ aa คิดเป็นร้อยละเท่าใด?",
+                options: ["ร้อยละ 50", "ร้อยละ 25", "ร้อยละ 75", "ร้อยละ 0"],
+                correct: "ร้อยละ 50",
+                hint: "Aa × aa ได้ลูก Aa : aa ในอัตราส่วน 1 : 1 (ครึ่งต่อครึ่ง)",
+                explanation: "เมื่อผสม Aa × aa จะได้รุ่นลูกมีจีโนไทป์ Aa (50%) และ aa (50%)"
+            },
+            {
+                cat: "กฎข้อที่ 1 ของเมนเดล",
+                q: "ถั่วลันเตาต้นสูงพันธุ์ทาง (Tt) ผสมกับต้นสูงพันธุ์ทาง (Tt) โอกาสได้ลูก 'ต้นสูง' คิดเป็นเศษส่วนเท่าใด?",
+                options: ["3/4", "1/4", "1/2", "1 (ทั้งหมด)"],
+                correct: "3/4",
+                hint: "อัตราส่วนฟีโนไทป์ของพันธุ์ทางผสมกันเองคือ เด่น 3 : ด้อย 1",
+                explanation: "Tt × Tt ได้ลูก TT (1), Tt (2) ซึ่งแสดงลักษณะต้นสูงรวม 3 ใน 4 ส่วน (3/4)"
+            },
+            {
+                cat: "การสร้างเซลล์สืบพันธุ์",
+                q: "สิ่งมีชีวิตที่มีจีโนไทป์ TtRr จะสร้างเซลล์สืบพันธุ์ที่แตกต่างกันได้ทั้งหมดกี่ชนิด?",
+                options: ["4 ชนิด", "2 ชนิด", "1 ชนิด", "8 ชนิด"],
+                correct: "4 ชนิด",
+                hint: "ใช้สูตร 2ⁿ โดย n คือจำนวนคู่ยีนที่เป็นพันธุ์ทาง (Heterozygous)",
+                explanation: "TtRr มีคู่ยีนพันธุ์ทาง 2 คู่ จึงสร้างเซลล์สืบพันธุ์ได้ 2² = 4 ชนิด คือ TR, Tr, tR, tr"
+            },
+            {
+                cat: "การสร้างเซลล์สืบพันธุ์",
+                q: "สิ่งมีชีวิตที่มีจีโนไทป์ TTRr สร้างเซลล์สืบพันธุ์ได้กี่ชนิด อะไรบ้าง?",
+                options: ["2 ชนิด (TR, Tr)", "4 ชนิด (TR, Tr, tR, tr)", "1 ชนิด (TTRr)", "2 ชนิด (TT, Rr)"],
+                correct: "2 ชนิด (TR, Tr)",
+                hint: "คู่ TT ให้แอลลีล T เพียงแบบเดียว ส่วน Rr ให้ R และ r",
+                explanation: "TTRr มีพันธุ์ทางเพียง 1 คู่ (Rr) จึงสร้างเซลล์สืบพันธุ์ได้ 2 ชนิด คือ TR และ Tr"
+            },
+            {
+                cat: "การข่มไม่สมบูรณ์",
+                q: "ดอกลิ้นมังกรสีชมพู (CᴿCᵂ) ผสมกันเอง (CᴿCᵂ × CᴿCᵂ) โอกาสได้ลูก 'ดอกสีชมพู' คิดเป็นร้อยละเท่าใด?",
+                options: ["ร้อยละ 50", "ร้อยละ 25", "ร้อยละ 75", "ร้อยละ 100"],
+                correct: "ร้อยละ 50",
+                hint: "รุ่นลูกจะได้สีแดง : สีชมพู : สีขาว = 1 : 2 : 1",
+                explanation: "CᴿCᵂ × CᴿCᵂ ได้ลูก CᴿCᴿ (25%), CᴿCᵂ สีชมพู (50%) และ CᵂCᵂ (25%)"
+            },
+            {
+                cat: "หมู่เลือด ABO",
+                q: "พ่อมีหมู่เลือด A พันธุ์ทาง (Iᴬi) แต่งงานกับแม่หมู่เลือด B พันธุ์ทาง (Iᴮi) โอกาสได้ลูก 'หมู่เลือด O' คือข้อใด?",
+                options: ["1/4 (ร้อยละ 25)", "1/2 (ร้อยละ 50)", "3/4 (ร้อยละ 75)", "0 (ไม่มีโอกาส)"],
+                correct: "1/4 (ร้อยละ 25)",
+                hint: "ลูกหมู่เลือด O ต้องมีจีโนไทป์ ii (ได้รับ i จากทั้งพ่อและแม่)",
+                explanation: "Iᴬi × Iᴮi ได้ลูก IᴬIᴮ (AB), Iᴬi (A), Iᴮi (B) และ ii (O) อย่างละ 1/4"
+            },
+            {
+                cat: "หมู่เลือด ABO",
+                q: "ชายหมู่เลือด AB แต่งงานกับหญิงหมู่เลือด O ลูกของครอบครัวนี้ 'ไม่มีโอกาส' มีหมู่เลือดใด?",
+                options: ["หมู่เลือด O และ AB", "หมู่เลือด A และ B", "หมู่เลือด A เท่านั้น", "หมู่เลือด B เท่านั้น"],
+                correct: "หมู่เลือด O และ AB",
+                hint: "พ่อให้ได้เฉพาะ Iᴬ หรือ Iᴮ ส่วนแม่ให้ได้เฉพาะ i",
+                explanation: "IᴬIᴮ × ii จะได้ลูกเฉพาะจีโนไทป์ Iᴬi (หมู่ A) และ Iᴮi (หมู่ B) เท่านั้น ไม่มีโอกาสได้ O หรือ AB"
+            },
+            {
+                cat: "ยีนบนโครโมโซมเพศ",
+                q: "โรคตาบอดสีควบคุมโดยยีนด้อยบนโครโมโซม X หากพ่อตาปกติ (XᶜY) แม่เป็นพาหะ (XᶜXᶜ') โอกาสที่ 'ลูกชาย' จะตาบอดสีคิดเป็นร้อยละเท่าใด?",
+                options: ["ร้อยละ 50", "ร้อยละ 0", "ร้อยละ 25", "ร้อยละ 100"],
+                correct: "ร้อยละ 50",
+                hint: "ลูกชายได้รับโครโมโซม X จากแม่เท่านั้น (แม่มี X ปกติ 1 แท่ง และ X ตาบอดสี 1 แท่ง)",
+                explanation: "ลูกชายมีโอกาสได้รับ X ปกติจากแม่ 50% และ X ตาบอดสีจากแม่ 50%"
+            },
+            {
+                cat: "ยีนบนโครโมโซมเพศ",
+                q: "พ่อเป็นโรคฮีโมฟีเลีย (XʰY) แต่งงานกับแม่ปกติพันธุ์แท้ (XᴴXᴴ) โอกาสที่ 'ลูกสาว' จะเป็นโรคฮีโมฟีเลียคือข้อใด?",
+                options: ["ร้อยละ 0 (เป็นพาหะทุกคน)", "ร้อยละ 50", "ร้อยละ 25", "ร้อยละ 100"],
+                correct: "ร้อยละ 0 (เป็นพาหะทุกคน)",
+                hint: "ลูกสาวได้รับ Xᴴ ปกติจากแม่เสมอ",
+                explanation: "ลูกสาวทุกคนจะมีจีโนไทป์ XᴴXʰ (ปกติแต่เป็นพาหะ) จึงไม่มีโอกาสเป็นโรค (0%)"
+            },
+            {
+                cat: "กฎข้อที่ 2 ของเมนเดล",
+                q: "ผสมถั่วลันเตา TtRr × ttrr โอกาสที่จะได้ลูกที่มีจีโนไทป์เหมือนพ่อ (TtRr) คิดเป็นเศษส่วนเท่าใด?",
+                options: ["1/4", "1/2", "1/8", "1/16"],
+                correct: "1/4",
+                hint: "คิดแยกทีละคู่: โอกาสได้ Tt (1/2) × โอกาสได้ Rr (1/2)",
+                explanation: "Tt × tt ได้ Tt = 1/2 และ Rr × rr ได้ Rr = 1/2 นำมาคูณกันได้ 1/2 × 1/2 = 1/4"
+            },
+            {
+                cat: "การทดสอบพันธุ์ (Test Cross)",
+                q: "หากต้องการทดสอบว่าถั่วลันเตาต้นสูงต้นหนึ่งเป็นพันธุ์แท้ (TT) หรือพันธุ์ทาง (Tt) ควรนำไปผสมกับต้นที่มีจีโนไทป์ใด?",
+                options: ["tt (ต้นเตี้ย)", "TT (ต้นสูงพันธุ์แท้)", "Tt (ต้นสูงพันธุ์ทาง)", "TtRr"],
+                correct: "tt (ต้นเตี้ย)",
+                hint: "Test Cross คือการผสมกับตัวทดสอบที่เป็นลักษณะด้อยพันธุ์แท้",
+                explanation: "การทำ Test Cross ต้องนำลักษณะเด่นที่ไม่ทราบจีโนไทป์ไปผสมกับลักษณะด้อยพันธุ์แท้ (tt)"
+            },
+            {
+                cat: "โรคทางพันธุกรรม (ออโตโซม)",
+                q: "พ่อและแม่มีผิวปกติทั้งคู่ แต่มีลูกคนแรกเป็นโรคผิวเผือก (aa) โอกาสที่ลูกคนที่สองจะเป็นโรคผิวเผือกอีกคิดเป็นร้อยละเท่าใด?",
+                options: ["ร้อยละ 25", "ร้อยละ 0", "ร้อยละ 50", "ร้อยละ 75"],
+                correct: "ร้อยละ 25",
+                hint: "พ่อและแม่ต้องเป็นพาหะ (Aa × Aa) ทั้งคู่ และการตั้งครรภ์แต่ละครั้งเป็นอิสระต่อกัน",
+                explanation: "พ่อแม่เป็น Aa × Aa โอกาสเกิดลูก aa ในแต่ละครั้งคือ 1/4 หรือร้อยละ 25 เสมอ"
+            },
+            {
+                cat: "การข่มร่วมกัน (Codominance)",
+                q: "ข้อใดแสดงลักษณะของการข่มร่วมกัน (Codominance) ในมนุษย์?",
+                options: ["หมู่เลือด AB (IᴬIᴮ)", "หมู่เลือด O (ii)", "โรคผิวเผือก", "ลักษณะลักยิ้ม"],
+                correct: "หมู่เลือด AB (IᴬIᴮ)",
+                hint: "แอลลีลทั้งสองแสดงลักษณะเด่นออกมาพร้อมกันโดยไม่ข่มกัน",
+                explanation: "จีโนไทป์ IᴬIᴮ แสดงทั้งแอนติเจน A และ B บนผิวเม็ดเลือดแดง เกิดเป็นหมู่เลือด AB"
+            },
+            {
+                cat: "กฎข้อที่ 1 ของเมนเดล",
+                q: "จีโนไทป์คู่ใดต่อไปนี้ เมื่อผสมพันธุ์กันแล้วจะได้รุ่นลูกที่มีฟีโนไทป์เหมือนกัน 100%?",
+                options: ["TT × tt", "Tt × Tt", "Tt × tt", "Iᴬi × Iᴮi"],
+                correct: "TT × tt",
+                hint: "พ่อให้แอลลีลเด่น T แก่ลูกทุกคน",
+                explanation: "TT × tt จะได้ลูกที่มีจีโนไทป์ Tt (ต้นสูง) เหมือนกันทั้งหมด 100%"
+            },
+            {
+                cat: "การสร้างเซลล์สืบพันธุ์",
+                q: "เหตุใดจีโนไทป์ Tt จึงไม่สามารถสร้างเซลล์สืบพันธุ์ที่มีรหัส 'Tt' ได้?",
+                options: ["เพราะแอลลีลคู่เดียวกันต้องแยกออกจากกันในระยะไมโอซิส", "เพราะยีน T ข่มยีน t อย่างสมบูรณ์", "เพราะ Tt เป็นลักษณะด้อย", "เพราะเซลล์สืบพันธุ์มีโครโมโซม 2 ชุด"],
+                correct: "เพราะแอลลีลคู่เดียวกันต้องแยกออกจากกันในระยะไมโอซิส",
+                hint: "นึกถึงกฎข้อที่ 1 ของเมนเดล (Law of Segregation)",
+                explanation: "ตามกฎแห่งการแยก แอลลีลที่เข้าคู่กันจะแยกไปคนละเซลล์สืบพันธุ์ ทำให้เซลล์สืบพันธุ์มีแอลลีลเพียงชุดเดียว (n)"
+            }
+        ];
+
+        const WIRE_THEMES = [
+            { name: "แดง", hex: "#ef4444", glow: "rgba(239,68,68,0.45)", bgBtn: "bg-rose-950/90 border-rose-500 hover:bg-rose-900 text-rose-100", badge: "bg-rose-600 text-white" },
+            { name: "น้ำเงิน", hex: "#3b82f6", glow: "rgba(59,130,246,0.45)", bgBtn: "bg-blue-950/90 border-blue-500 hover:bg-blue-900 text-blue-100", badge: "bg-blue-600 text-white" },
+            { name: "เหลือง", hex: "#eab308", glow: "rgba(234,179,8,0.45)", bgBtn: "bg-amber-950/90 border-amber-500 hover:bg-amber-900 text-amber-100", badge: "bg-amber-500 text-slate-950" },
+            { name: "เขียว", hex: "#10b981", glow: "rgba(16,185,129,0.45)", bgBtn: "bg-emerald-950/90 border-emerald-500 hover:bg-emerald-900 text-emerald-100", badge: "bg-emerald-600 text-white" }
+        ];
+
+        // ==========================================
+        // 3. GAME STATE
+        // ==========================================
+        let game = {
+            studentName: "",
+            studentClass: "",
+            studentNo: "",
+            difficulty: "normal",
+            initialTime: 60,
+            timeLeft: 60,
+            totalQuestions: 8,
+            questions: [],
+            qIndex: 0,
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            totalClicks: 0,
+            correctClicks: 0,
+            cutWiresCurrentQ: new Set(),
+            hadMistakeCurrentQ: false,
+            historyLog: [], // { q, correct, explanation, cleanPass }
+            timerId: null,
+            lastTickSec: 60,
+            isTransitioning: false
+        };
+
+        function shuffle(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function fillDemoStudent() {
+            document.getElementById('input-name').value = "นายธนกฤต วงศ์สุวรรณ";
+            document.getElementById('input-class').value = "ม.5/1";
+            document.getElementById('input-no').value = "2";
+        }
+
+        function showScreen(id) {
+            ['screen-start', 'screen-game', 'screen-report'].forEach(s => {
+                document.getElementById(s).classList.add('hidden');
+            });
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('btn-abort').classList.toggle('hidden', id !== 'screen-game');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function abortToMenu() {
+            clearInterval(game.timerId);
+            showScreen('screen-start');
+        }
+
+        // ==========================================
+        // 4. START & TIMER LOOP
+        // ==========================================
+        function startMission(e) {
+            e.preventDefault();
+            game.studentName = document.getElementById('input-name').value.trim();
+            game.studentClass = document.getElementById('input-class').value;
+            game.studentNo = document.getElementById('input-no').value.trim();
+            game.difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+
+            initMissionState();
+        }
+
+        function replaySameSettings() {
+            initMissionState();
+        }
+
+        function initMissionState() {
+            clearInterval(game.timerId);
+            const isExpert = game.difficulty === 'expert';
+            game.initialTime = isExpert ? 45 : 60;
+            game.timeLeft = game.initialTime;
+            game.totalQuestions = isExpert ? 10 : 8;
+            game.questions = shuffle(QUESTION_POOL).slice(0, game.totalQuestions);
+            game.qIndex = 0;
+            game.score = 0;
+            game.combo = 0;
+            game.maxCombo = 0;
+            game.totalClicks = 0;
+            game.correctClicks = 0;
+            game.historyLog = [];
+            game.lastTickSec = Math.ceil(game.timeLeft);
+            game.isTransitioning = false;
+
+            document.getElementById('hud-q-total').textContent = game.totalQuestions;
+            updateHudStats();
+            updateTimerDisplay();
+
+            showScreen('screen-game');
+            renderCurrentQuestion();
+
+            // Start 100ms precision timer
+            game.timerId = setInterval(() => {
+                game.timeLeft = Math.max(0, game.timeLeft - 0.1);
+                updateTimerDisplay();
+
+                const currentWhole = Math.ceil(game.timeLeft);
+                if (currentWhole < game.lastTickSec && currentWhole > 0) {
+                    game.lastTickSec = currentWhole;
+                    if (currentWhole <= 15) {
+                        playSfx('tick');
+                    }
+                }
+
+                if (game.timeLeft <= 0) {
+                    clearInterval(game.timerId);
+                    endMission(false);
+                }
+            }, 100);
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('hud-timer');
+            const boxEl = document.getElementById('timer-box');
+            timerEl.textContent = game.timeLeft.toFixed(1);
+
+            if (game.timeLeft <= 15) {
+                timerEl.className = "digital-font text-3xl sm:text-4xl font-bold text-rose-500 tracking-wider animate-pulse";
+                boxEl.className = "bg-black border-2 border-rose-500 rounded-2xl px-4 py-2 text-center shadow-lg shadow-rose-950/60 min-w-[135px] sm:min-w-[160px] relative";
+            } else if (game.timeLeft <= 30) {
+                timerEl.className = "digital-font text-3xl sm:text-4xl font-bold text-amber-400 tracking-wider";
+                boxEl.className = "bg-black border-2 border-amber-500/70 rounded-2xl px-4 py-2 text-center shadow-inner min-w-[135px] sm:min-w-[160px] relative";
+            } else {
+                timerEl.className = "digital-font text-3xl sm:text-4xl font-bold text-emerald-400 tracking-wider";
+                boxEl.className = "bg-black border-2 border-emerald-500/60 rounded-2xl px-4 py-2 text-center shadow-inner min-w-[135px] sm:min-w-[160px] relative";
+            }
+        }
+
+        function updateHudStats() {
+            document.getElementById('hud-q-num').textContent = Math.min(game.qIndex + 1, game.totalQuestions);
+            document.getElementById('hud-progress-bar').style.width = `${(game.qIndex / game.totalQuestions) * 100}%`;
+            document.getElementById('hud-score').textContent = game.score;
+            document.getElementById('hud-combo').textContent = game.combo;
+        }
+
+        // ==========================================
+        // 5. RENDER QUESTION & 4 COLORED WIRES
+        // ==========================================
+        function renderCurrentQuestion() {
+            const qObj = game.questions[game.qIndex];
+            game.cutWiresCurrentQ = new Set();
+            game.hadMistakeCurrentQ = false;
+            game.isTransitioning = false;
+
+            document.getElementById('q-category-tag').textContent = qObj.cat;
+            document.getElementById('q-text').textContent = qObj.q;
+            document.getElementById('live-feedback').classList.add('hidden');
+            updateHudStats();
+
+            // Shuffle options across the 4 wires
+            const shuffledOpts = shuffle(qObj.options);
+            const container = document.getElementById('wires-container');
+
+            container.innerHTML = shuffledOpts.map((optText, idx) => {
+                const wire = WIRE_THEMES[idx];
+                const safeOpt = optText.replace(/'/g, "\\'");
+                return `
+                    <div id="wire-row-${idx}" class="relative flex items-center justify-between gap-2 sm:gap-4 bg-slate-950/70 p-2.5 sm:p-3 rounded-2xl border border-slate-800 transition">
+                        <!-- Left Terminal Socket -->
+                        <div class="w-4 h-7 rounded bg-slate-700 border border-slate-500 shrink-0 flex items-center justify-center">
+                            <span class="w-2 h-2 rounded-full" style="background-color: ${wire.hex}"></span>
+                        </div>
+
+                        <!-- SVG Wire Graphic (Intact vs Severed) -->
+                        <div id="wire-svg-box-${idx}" class="hidden sm:block w-24 md:w-36 h-8 shrink-0">
+                            <svg viewBox="0 0 120 30" class="w-full h-full overflow-visible">
+                                <path d="M 0 15 Q 60 ${idx % 2 === 0 ? '4' : '26'} 120 15" 
+                                      stroke="${wire.hex}" stroke-width="6" fill="none" stroke-linecap="round"
+                                      style="filter: drop-shadow(0 0 4px ${wire.glow});" />
+                            </svg>
+                        </div>
+
+                        <!-- Interactive Cut Button -->
+                        <button type="button" id="wire-btn-${idx}" onclick="cutWire(${idx}, '${safeOpt}')"
+                                class="flex-grow py-3 px-4 rounded-xl border-2 ${wire.bgBtn} font-kanit font-medium text-sm sm:text-base transition transform active:scale-95 flex items-center justify-between shadow-md cursor-pointer">
+                            <div class="flex items-center space-x-2.5 text-left">
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${wire.badge} shrink-0">สาย${wire.name}</span>
+                                <span>${optText}</span>
+                            </div>
+                            <span class="text-xs opacity-80 ml-2 shrink-0 flex items-center space-x-1 bg-black/30 px-2.5 py-1 rounded-lg">
+                                <i class="fas fa-cut"></i>
+                                <span class="hidden sm:inline">ตัดสาย</span>
+                            </span>
+                        </button>
+
+                        <!-- Right Terminal Socket -->
+                        <div class="w-4 h-7 rounded bg-slate-700 border border-slate-500 shrink-0 flex items-center justify-center">
+                            <span class="w-2 h-2 rounded-full" style="background-color: ${wire.hex}"></span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 6. CUT WIRE ACTION & FEEDBACK
+        // ==========================================
+        function cutWire(wireIdx, chosenText) {
+            if (game.isTransitioning || game.timeLeft <= 0) return;
+            if (game.cutWiresCurrentQ.has(wireIdx)) return;
+
+            game.cutWiresCurrentQ.add(wireIdx);
+            game.totalClicks++;
+
+            const qObj = game.questions[game.qIndex];
+            const wire = WIRE_THEMES[wireIdx];
+            const btn = document.getElementById(`wire-btn-${wireIdx}`);
+            const svgBox = document.getElementById(`wire-svg-box-${wireIdx}`);
+            const fbBox = document.getElementById('live-feedback');
+            const fbIcon = document.getElementById('live-feedback-icon');
+            const fbMsg = document.getElementById('live-feedback-msg');
+
+            // Render Severed Wire SVG with Spark
+            if (svgBox) {
+                svgBox.innerHTML = `
+                    <svg viewBox="0 0 120 30" class="w-full h-full overflow-visible">
+                        <path d="M 0 15 Q 30 8 50 22" stroke="${wire.hex}" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" />
+                        <path d="M 70 8 Q 95 20 120 15" stroke="${wire.hex}" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" />
+                        <circle cx="60" cy="15" r="5" fill="#facc15" class="animate-ping" />
+                    </svg>
+                `;
+            }
+
+            if (chosenText === qObj.correct) {
+                // CORRECT WIRE CUT!
+                game.isTransitioning = true;
+                game.correctClicks++;
+                game.combo++;
+                if (game.combo > game.maxCombo) game.maxCombo = game.combo;
+
+                const comboBonus = (game.combo - 1) * 25;
+                const earned = 100 + comboBonus;
+                game.score += earned;
+                updateHudStats();
+                playSfx('snip_ok');
+
+                btn.className = "flex-grow py-3 px-4 rounded-xl border-2 border-emerald-400 bg-emerald-600 text-white font-kanit font-bold text-sm sm:text-base flex items-center justify-between shadow-lg";
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-lg"></i>
+                        <span>${chosenText}</span>
+                    </div>
+                    <span class="text-xs bg-black/30 px-2.5 py-1 rounded-lg">+${earned} คะแนน</span>
+                `;
+
+                fbBox.className = "mt-3 rounded-2xl p-3.5 text-xs sm:text-sm font-medium flex items-center space-x-2.5 bg-emerald-950/90 border border-emerald-500 text-emerald-200 animate-pop";
+                fbIcon.className = "fas fa-check-circle text-emerald-400 text-lg";
+                fbMsg.innerHTML = `<strong>ตัดสายไฟถูกต้อง!</strong> +${earned} คะแนน ${game.combo > 1 ? `(คอมโบ ${game.combo}x!)` : ''}`;
+
+                game.historyLog.push({
+                    q: qObj.q,
+                    correct: qObj.correct,
+                    explanation: qObj.explanation,
+                    cleanPass: !game.hadMistakeCurrentQ
+                });
+
+                setTimeout(() => {
+                    game.qIndex++;
+                    if (game.qIndex >= game.totalQuestions) {
+                        clearInterval(game.timerId);
+                        endMission(true);
+                    } else {
+                        renderCurrentQuestion();
+                    }
+                }, 750);
+
+            } else {
+                // WRONG WIRE CUT -> -10 SECONDS PENALTY!
+                game.hadMistakeCurrentQ = true;
+                game.combo = 0;
+                game.timeLeft = Math.max(0, game.timeLeft - 10);
+                updateHudStats();
+                updateTimerDisplay();
+                playSfx('snip_wrong');
+
+                // Shake Bomb Casing
+                const casing = document.getElementById('bomb-device');
+                casing.classList.remove('animate-shake-hard');
+                void casing.offsetWidth;
+                casing.classList.add('animate-shake-hard');
+
+                // Floating -10s badge
+                const anchor = document.getElementById('penalty-anchor');
+                const pop = document.createElement('span');
+                pop.className = "inline-block bg-rose-600 text-white font-kanit font-bold text-sm px-2 py-0.5 rounded-lg shadow animate-penalty";
+                pop.textContent = "-10.0s!";
+                anchor.appendChild(pop);
+                setTimeout(() => pop.remove(), 900);
+
+                // Disable cut wire button
+                btn.disabled = true;
+                btn.className = "flex-grow py-3 px-4 rounded-xl border border-slate-800 bg-slate-900/60 text-slate-500 line-through font-kanit text-sm sm:text-base flex items-center justify-between cursor-not-allowed";
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-bolt text-amber-500"></i>
+                        <span>${chosenText}</span>
+                    </div>
+                    <span class="text-xs text-rose-400 no-underline">สายขาด (-10 วิ)</span>
+                `;
+
+                // Show Hint so student learns and cuts remaining wire
+                fbBox.className = "mt-3 rounded-2xl p-3.5 text-xs sm:text-sm font-medium flex items-start space-x-2.5 bg-rose-950/90 border border-rose-500 text-rose-200 animate-pop";
+                fbIcon.className = "fas fa-exclamation-triangle text-amber-400 text-lg mt-0.5";
+                fbMsg.innerHTML = `<strong>ตัดผิดสาย! เวลาลด -10 วินาที</strong><br><span class="text-amber-200">คำใบ้: ${qObj.hint} — รีบเลือกตัดสายที่เหลือ!</span>`;
+
+                if (game.timeLeft <= 0) {
+                    clearInterval(game.timerId);
+                    // Log remaining uncompleted question
+                    game.historyLog.push({
+                        q: qObj.q,
+                        correct: qObj.correct,
+                        explanation: qObj.explanation,
+                        cleanPass: false
+                    });
+                    endMission(false);
+                }
+            }
+        }
+
+        // ==========================================
+        // 7. END MISSION & REPORT CARD
+        // ==========================================
+        function endMission(isVictory) {
+            const banner = document.getElementById('report-banner');
+            const iconCircle = document.getElementById('report-icon-circle');
+            const statusTitle = document.getElementById('report-status-title');
+
+            if (isVictory) {
+                playSfx('win');
+                const timeBonus = Math.round(game.timeLeft * 10);
+                game.score += timeBonus;
+
+                banner.className = "p-6 sm:p-8 text-center text-white relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700";
+                iconCircle.innerHTML = '<i class="fas fa-shield-alt"></i>';
+                statusTitle.textContent = `กู้ระเบิดสำเร็จ! (โบนัสเวลา +${timeBonus} คะแนน)`;
+            } else {
+                playSfx('boom');
+                banner.className = "p-6 sm:p-8 text-center text-white relative overflow-hidden bg-gradient-to-r from-rose-700 via-red-800 to-slate-900";
+                iconCircle.innerHTML = '<i class="fas fa-bomb"></i>';
+                statusTitle.textContent = "หมดเวลา! ระบบป้องกันทำงาน";
+            }
+
+            const accuracy = game.totalClicks > 0 ? Math.round((game.correctClicks / game.totalClicks) * 100) : 0;
+
+            document.getElementById('report-student-meta').textContent = 
+                `เจ้าหน้าที่: ${game.studentName} (${game.studentClass} เลขที่ ${game.studentNo}) • โรงเรียนบ่อทองวงษ์จันทร์วิทยา`;
+            document.getElementById('rep-score').textContent = game.score;
+            document.getElementById('rep-accuracy').textContent = `${accuracy}%`;
+            document.getElementById('rep-time-left').textContent = `${game.timeLeft.toFixed(1)} วิ`;
+            document.getElementById('rep-max-combo').textContent = `${game.maxCombo}x`;
+
+            // Populate Review Table
+            const tbody = document.getElementById('rep-table-body');
+            tbody.innerHTML = game.historyLog.map((item, idx) => `
+                <tr>
+                    <td class="py-3 px-3 text-center font-bold text-slate-400">${idx + 1}</td>
+                    <td class="py-3 px-3 font-medium text-slate-200">${item.q}</td>
+                    <td class="py-3 px-3 font-kanit font-bold text-emerald-400">${item.correct}</td>
+                    <td class="py-3 px-3 text-slate-400">${item.explanation}</td>
+                    <td class="py-3 px-3 text-center">
+                        ${item.cleanPass 
+                            ? '<span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">แม่นยำ</span>' 
+                            : '<span class="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">มีตัดผิด</span>'}
+                    </td>
+                </tr>
+            `).join('');
+
+            showScreen('screen-report');
+        }
+    </script>
+</body>
+</html>
