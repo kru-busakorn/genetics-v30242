@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mendel's Punnett Lab: ห้องปฏิบัติการผสมพันธุ์ตามกฎของเมนเดล</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt & Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #ecfdf5 0%, #fefce8 50%, #f0fdf4 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-prompt {
+            font-family: 'Prompt', sans-serif;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .drop-zone-active {
+            border-color: #d97706 !important;
+            background-color: #fef3c7 !important;
+            transform: scale(1.03);
+        }
+        .tile-selected {
+            ring: 3px solid #d97706;
+            border-color: #d97706 !important;
+            background-color: #fef3c7 !important;
+            transform: translateY(-2px);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between">
+
+    <!-- ================= HEADER ================= -->
+    <header class="bg-white/95 backdrop-blur-md border-b-2 border-emerald-200 shadow-sm sticky top-0 z-40 no-print">
+        <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+                <img src="https://img1.pic.in.th/images/Schl_Logo.jpg" 
+                     onerror="this.src='https://placehold.co/48x48/059669/ffffff?text=BTW'" 
+                     alt="โลโก้โรงเรียนบ่อทองวงษ์จันทร์วิทยา" 
+                     class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm">
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold text-emerald-900 leading-tight">Mendel's Punnett Lab</h1>
+                    <p class="text-xs text-slate-500">ห้องปฏิบัติการผสมพันธุ์ตามกฎของเมนเดล • รร.บ่อทองวงษ์จันทร์วิทยา</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div id="header-score-pill" class="hidden bg-amber-50 border border-amber-300 px-3 py-1 rounded-full text-xs sm:text-sm font-prompt font-bold text-amber-800 flex items-center space-x-1.5">
+                    <i class="fas fa-star text-amber-500"></i>
+                    <span id="header-score-val">0</span>
+                    <span class="font-normal text-xs">คะแนน</span>
+                </div>
+                <button onclick="toggleSound()" class="p-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition" title="เปิด/ปิดเสียง">
+                    <i id="icon-sound" class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= MAIN CONTAINER ================= -->
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6">
+        <div class="w-full max-w-4xl">
+
+            <!-- ================= SCREEN 1: START SCREEN ================= -->
+            <section id="screen-start" class="bg-white rounded-3xl shadow-xl border-2 border-emerald-100 overflow-hidden animate-pop">
+                <div class="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 p-6 sm:p-8 text-center text-white relative overflow-hidden">
+                    <i class="fas fa-seedling absolute -left-4 -bottom-4 text-8xl text-white/10"></i>
+                    <i class="fas fa-dna absolute -right-4 -top-4 text-8xl text-amber-300/15 rotate-12"></i>
+
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="bg-white p-1.5 rounded-full shadow-lg mb-3 border-2 border-amber-300">
+                            <img src="https://img1.pic.in.th/images/Schl_Logo.jpg" 
+                                 onerror="this.src='https://placehold.co/96x96/059669/ffffff?text=BTW'" 
+                                 alt="โลโก้โรงเรียน" 
+                                 class="w-20 h-20 rounded-full object-cover">
+                        </div>
+                        <span class="bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-semibold px-3.5 py-1 rounded-full mb-2">
+                            รายวิชา พันธุศาสตร์และวิวัฒนาการ • โรงเรียนบ่อทองวงษ์จันทร์วิทยา
+                        </span>
+                        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight">Mendel's Punnett Lab</h1>
+                        <p class="text-sm sm:text-lg text-emerald-100 mt-1">ห้องปฏิบัติการผสมพันธุ์ตามกฎของเมนเดล (5 ภารกิจ)</p>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <!-- 4-Step Process Preview -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3">
+                            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-1.5">1</div>
+                            <p class="font-prompt font-bold text-xs sm:text-sm text-emerald-900">รุ่นพ่อแม่ (P)</p>
+                            <p class="text-[11px] text-slate-600">ถอดรหัสจีโนไทป์</p>
+                        </div>
+                        <div class="bg-teal-50 border border-teal-200 rounded-2xl p-3">
+                            <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-1.5">2</div>
+                            <p class="font-prompt font-bold text-xs sm:text-sm text-teal-900">เซลล์สืบพันธุ์</p>
+                            <p class="text-[11px] text-slate-600">แยกแอลลีลตามกฎ</p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+                            <div class="w-8 h-8 rounded-full bg-amber-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-1.5">3</div>
+                            <p class="font-prompt font-bold text-xs sm:text-sm text-amber-900">ตารางพันเนต</p>
+                            <p class="text-[11px] text-slate-600">ลากวาง / แตะวาง</p>
+                        </div>
+                        <div class="bg-lime-50 border border-lime-200 rounded-2xl p-3">
+                            <div class="w-8 h-8 rounded-full bg-lime-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-1.5">4</div>
+                            <p class="font-prompt font-bold text-xs sm:text-sm text-lime-900">สรุปรุ่นลูก (F₁)</p>
+                            <p class="text-[11px] text-slate-600">หาอัตราส่วน</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="startLab(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อ - นามสกุล นักเรียน <span class="text-rose-500">*</span></label>
+                                <input type="text" id="stu-name" required placeholder="เช่น นางสาวกัญญาวีร์ รักเรียน" 
+                                       class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">ชั้น / เลขที่ <span class="text-rose-500">*</span></label>
+                                <input type="text" id="stu-class" required placeholder="เช่น ม.5/1 เลขที่ 1" 
+                                       class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-prompt font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-flask"></i>
+                            <span>เข้าสู่ห้องปฏิบัติการ (เริ่มภารกิจที่ 1)</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= SCREEN 2: ACTIVE LAB MISSION ================= -->
+            <section id="screen-lab" class="hidden space-y-4 animate-pop">
+                
+                <!-- Mission Header & Progress -->
+                <div class="bg-white rounded-3xl shadow-md border border-emerald-200 p-4 sm:p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div>
+                            <span id="mission-badge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">ภารกิจที่ 1 / 5</span>
+                            <h2 id="mission-title" class="text-lg sm:text-xl font-bold text-slate-800 mt-1">Monohybrid Cross: ถั่วลันเตาต้นสูงพันธุ์ทาง × ต้นเตี้ย</h2>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <!-- 5 Mission Dots -->
+                            <div id="mission-dots" class="flex space-x-1.5"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario & Allele Key -->
+                    <div class="bg-gradient-to-r from-emerald-50 to-amber-50/70 border border-emerald-200 rounded-2xl p-3.5 sm:p-4 space-y-2">
+                        <p id="mission-story" class="text-sm sm:text-base text-slate-800 leading-relaxed"></p>
+                        <div id="mission-legend" class="inline-block bg-white px-3 py-1.5 rounded-xl border border-amber-200 text-xs font-semibold text-amber-900"></div>
+                    </div>
+
+                    <!-- 4-Step Wizard Bar -->
+                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2 mt-4 pt-3 border-t border-slate-100">
+                        <div id="step-pill-1" class="step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold transition">1. รุ่นพ่อแม่ (P)</div>
+                        <div id="step-pill-2" class="step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold transition">2. เซลล์สืบพันธุ์</div>
+                        <div id="step-pill-3" class="step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold transition">3. ตารางพันเนต</div>
+                        <div id="step-pill-4" class="step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold transition">4. สรุปรุ่นลูก (F₁)</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Step Workspace -->
+                <div id="step-workspace" class="bg-white rounded-3xl shadow-lg border border-emerald-100 p-5 sm:p-7 min-h-[360px]">
+                    <!-- Step 1, 2, 3, or 4 injected here -->
+                </div>
+
+            </section>
+
+            <!-- ================= SCREEN 3: FINAL REPORT CARD ================= -->
+            <section id="screen-summary" class="hidden animate-pop">
+                <div class="bg-white rounded-3xl shadow-xl border-2 border-emerald-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-700 to-teal-800 p-6 sm:p-8 text-white text-center relative">
+                        <div class="w-16 h-16 rounded-full bg-amber-400 text-emerald-950 flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold">ปฏิบัติการเสร็จสมบูรณ์!</h2>
+                        <p id="sum-student-info" class="text-emerald-100 text-sm mt-1">นักเรียน -</p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                                <p class="text-xs text-amber-800 font-semibold">คะแนนรวมทั้งหมด</p>
+                                <p id="sum-total-score" class="text-3xl font-bold text-amber-600 mt-1">0 / 100</p>
+                            </div>
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+                                <p class="text-xs text-emerald-800 font-semibold">ภารกิจที่สำเร็จ</p>
+                                <p class="text-3xl font-bold text-emerald-600 mt-1">5 / 5 ภารกิจ</p>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-200 rounded-2xl p-4">
+                                <p class="text-xs text-teal-800 font-semibold">ระดับความเชี่ยวชาญ</p>
+                                <p id="sum-rank" class="text-xl font-bold text-teal-700 mt-2">นักพันธุศาสตร์ระดับปรมาจารย์</p>
+                            </div>
+                        </div>
+
+                        <!-- Skill Breakdown -->
+                        <div class="space-y-3">
+                            <h3 class="font-prompt font-bold text-base text-slate-800">สรุปคะแนนความแม่นยำแยกตามขั้นตอนของเมนเดล</h3>
+                            <div id="sum-skills-bars" class="space-y-3"></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2 no-print">
+                            <button onclick="window.print()" class="px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-prompt font-bold rounded-2xl shadow transition flex items-center justify-center space-x-2">
+                                <i class="fas fa-print"></i>
+                                <span>พิมพ์ใบรายงานผล / บันทึก PDF</span>
+                            </button>
+                            <button onclick="restartWholeLab()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-prompt font-bold rounded-2xl shadow transition flex items-center justify-center space-x-2">
+                                <i class="fas fa-redo"></i>
+                                <span>ทำภารกิจใหม่อีกครั้ง</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ================= MODAL: EXPLANATION FEEDBACK ================= -->
+    <div id="feedback-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div id="modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 animate-pop text-center">
+            <div id="modal-icon" class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"></div>
+            <h3 id="modal-title" class="font-prompt font-bold text-xl mb-2">หัวข้อ</h3>
+            <div id="modal-body" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed mb-5"></div>
+            <button id="modal-btn" class="w-full py-3 rounded-xl font-prompt font-bold text-white shadow transition">ดำเนินการต่อ</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/80 border-t border-emerald-100 py-3 px-4 text-center text-xs text-slate-500 no-print">
+        Mendel's Punnett Lab • สื่อการสอนเชิงรุก (Active Learning) โรงเรียนบ่อทองวงษ์จันทร์วิทยา
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // ==========================================
+        // 1. SOUND SYSTEM (Tone.js)
+        // ==========================================
+        let soundOn = true;
+        function toggleSound() {
+            soundOn = !soundOn;
+            document.getElementById('icon-sound').className = soundOn ? 'fas fa-volume-up' : 'fas fa-volume-mute text-slate-400';
+        }
+        function playTone(type) {
+            if (!soundOn) return;
+            try {
+                if (typeof Tone === 'undefined') return;
+                if (Tone.context.state !== 'running') Tone.start();
+                const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.volume.value = -10;
+                const now = Tone.now();
+                if (type === 'click') synth.triggerAttackRelease("E5", "32n", now);
+                if (type === 'ok') synth.triggerAttackRelease(["C5", "E5", "G5"], "16n", now);
+                if (type === 'err') synth.triggerAttackRelease(["Eb3", "A2"], "8n", now);
+                if (type === 'win') {
+                    synth.triggerAttackRelease("C5", "16n", now);
+                    synth.triggerAttackRelease("E5", "16n", now + 0.1);
+                    synth.triggerAttackRelease("G5", "16n", now + 0.2);
+                    synth.triggerAttackRelease("C6", "8n", now + 0.3);
+                }
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // 2. 5 MISSIONS DATA (คลังภารกิจตามกฎเมนเดล)
+        // ==========================================
+        const MISSIONS = [
+            {
+                id: 1,
+                badge: "ภารกิจที่ 1 / 5 • พื้นฐาน Monohybrid Cross",
+                title: "ถั่วลันเตาต้นสูงพันธุ์ทาง × ต้นเตี้ย",
+                story: "นำถั่วลันเตา <strong>พ่อต้นสูงพันธุ์ทาง</strong> ผสมกับ <strong>แม่ต้นเตี้ย</strong> จงหาจีโนไทป์และฟีโนไทป์ของรุ่นลูก (F₁)",
+                legend: "กำหนด: T = ต้นสูง (เด่น), t = ต้นเตี้ย (ด้อย)",
+                parent1: { label: "พ่อ: ต้นสูงพันธุ์ทาง", icon: "🌱⬆️", options: ["TT", "Tt", "tt"], correct: "Tt", reason: "ต้นสูงพันธุ์ทาง (Heterozygous) ต้องมีแอลลีลเด่นคู่กับแอลลีลด้อย คือ Tt" },
+                parent2: { label: "แม่: ต้นเตี้ย", icon: "🌿⬇️", options: ["TT", "Tt", "tt"], correct: "tt", reason: "ต้นเตี้ยเป็นลักษณะด้อย จะแสดงออกได้เมื่อมีแอลลีลด้อยคู่กันเท่านั้น คือ tt" },
+                gametes1: { label: "เซลล์สืบพันธุ์ของพ่อ (Tt)", choices: ["T", "t", "Tt", "TT"], correct: ["T", "t"] },
+                gametes2: { label: "เซลล์สืบพันธุ์ของแม่ (tt)", choices: ["t", "T", "tt"], correct: ["t", "t"], allowDuplicateSlot: true, uniqueGametes: ["t"] },
+                // For 2x2 Punnett Square: top = Parent 1 (2 slots), left = Parent 2 (2 slots)
+                topSlots: ["T", "t"],
+                leftSlots: ["t", "t"],
+                // Grid 2x2 row by row: [row0col0, row0col1, row1col0, row1col1]
+                cells: [
+                    { genotype: "Tt", phenotype: "ต้นสูง", icon: "🌱⬆️" },
+                    { genotype: "tt", phenotype: "ต้นเตี้ย", icon: "🌿⬇️" },
+                    { genotype: "Tt", phenotype: "ต้นสูง", icon: "🌱⬆️" },
+                    { genotype: "tt", phenotype: "ต้นเตี้ย", icon: "🌿⬇️" }
+                ],
+                offspringTiles: ["TT", "Tt", "tt"],
+                genoRatio: {
+                    question: "อัตราส่วนจีโนไทป์ของรุ่นลูก (Tt : tt) คือข้อใด?",
+                    options: ["1 : 1 (หรือ 2 : 2)", "3 : 1", "1 : 2 : 1", "4 : 0"],
+                    correct: "1 : 1 (หรือ 2 : 2)",
+                    reason: "ในตารางมี Tt จำนวน 2 ช่อง และ tt จำนวน 2 ช่อง คิดเป็นอัตราส่วน 2 : 2 หรือ 1 : 1"
+                },
+                phenoRatio: {
+                    question: "อัตราส่วนฟีโนไทป์ของรุ่นลูก (ต้นสูง : ต้นเตี้ย) คือข้อใด?",
+                    options: ["ต้นสูง : ต้นเตี้ย = 1 : 1", "ต้นสูง : ต้นเตี้ย = 3 : 1", "ต้นสูงทั้งหมด 100%", "ต้นเตี้ยทั้งหมด 100%"],
+                    correct: "ต้นสูง : ต้นเตี้ย = 1 : 1",
+                    reason: "ลูก Tt (ต้นสูง) 2 ช่อง และ tt (ต้นเตี้ย) 2 ช่อง ดังนั้นอัตราส่วนฟีโนไทป์คือ 1 : 1 (ร้อยละ 50 : 50)"
+                }
+            },
+            {
+                id: 2,
+                badge: "ภารกิจที่ 2 / 5 • กฎแห่งการแยก (3:1 Ratio)",
+                title: "ถั่วลันเตาต้นสูงพันธุ์ทาง × ต้นสูงพันธุ์ทาง",
+                story: "นำถั่วลันเตา <strong>พ่อต้นสูงพันธุ์ทาง</strong> ผสมกับ <strong>แม่ต้นสูงพันธุ์ทาง</strong> เพื่อพิสูจน์อัตราส่วน 3 : 1 ของเมนเดล",
+                legend: "กำหนด: T = ต้นสูง (เด่น), t = ต้นเตี้ย (ด้อย)",
+                parent1: { label: "พ่อ: ต้นสูงพันธุ์ทาง", icon: "🌱⬆️", options: ["TT", "Tt", "tt"], correct: "Tt", reason: "ต้นสูงพันธุ์ทาง คือ Tt" },
+                parent2: { label: "แม่: ต้นสูงพันธุ์ทาง", icon: "🌱⬆️", options: ["TT", "Tt", "tt"], correct: "Tt", reason: "ต้นสูงพันธุ์ทาง คือ Tt" },
+                gametes1: { label: "เซลล์สืบพันธุ์ของพ่อ (Tt)", choices: ["T", "t", "Tt"], correct: ["T", "t"] },
+                gametes2: { label: "เซลล์สืบพันธุ์ของแม่ (Tt)", choices: ["T", "t", "Tt"], correct: ["T", "t"] },
+                topSlots: ["T", "t"],
+                leftSlots: ["T", "t"],
+                cells: [
+                    { genotype: "TT", phenotype: "ต้นสูง", icon: "🌱⬆️" },
+                    { genotype: "Tt", phenotype: "ต้นสูง", icon: "🌱⬆️" },
+                    { genotype: "Tt", phenotype: "ต้นสูง", icon: "🌱⬆️" },
+                    { genotype: "tt", phenotype: "ต้นเตี้ย", icon: "🌿⬇️" }
+                ],
+                offspringTiles: ["TT", "Tt", "tt"],
+                genoRatio: {
+                    question: "อัตราส่วนจีโนไทป์ของรุ่นลูก (TT : Tt : tt) คือข้อใด?",
+                    options: ["1 : 2 : 1", "3 : 1", "1 : 1", "2 : 1 : 1"],
+                    correct: "1 : 2 : 1",
+                    reason: "ในตารางมี TT = 1 ช่อง, Tt = 2 ช่อง และ tt = 1 ช่อง ได้อัตราส่วน 1 : 2 : 1"
+                },
+                phenoRatio: {
+                    question: "อัตราส่วนฟีโนไทป์ของรุ่นลูก (ต้นสูง : ต้นเตี้ย) คือข้อใด?",
+                    options: ["ต้นสูง : ต้นเตี้ย = 3 : 1", "ต้นสูง : ต้นเตี้ย = 1 : 1", "ต้นสูง : ต้นเตี้ย = 2 : 2", "ต้นสูงทั้งหมด 100%"],
+                    correct: "ต้นสูง : ต้นเตี้ย = 3 : 1",
+                    reason: "TT (1) และ Tt (2) แสดงลักษณะต้นสูงรวม 3 ช่อง ส่วน tt (1) เป็นต้นเตี้ย 1 ช่อง ได้อัตราส่วน 3 : 1"
+                }
+            },
+            {
+                id: 3,
+                badge: "ภารกิจที่ 3 / 5 • การข่มไม่สมบูรณ์ (Incomplete Dominance)",
+                title: "ดอกลิ้นมังกรสีชมพู × ดอกลิ้นมังกรสีชมพู",
+                story: "สีดอกลิ้นมังกรถ่ายทอดแบบ <strong>การข่มไม่สมบูรณ์</strong> นำต้นพ่อ <strong>ดอกสีชมพู</strong> ผสมกับต้นแม่ <strong>ดอกสีชมพู</strong>",
+                legend: "กำหนด: CᴿCᴿ = ดอกสีแดง, CᴿCᵂ = ดอกสีชมพู, CᵂCᵂ = ดอกสีขาว",
+                parent1: { label: "พ่อ: ดอกสีชมพู", icon: "🌸", options: ["CᴿCᴿ", "CᴿCᵂ", "CᵂCᵂ"], correct: "CᴿCᵂ", reason: "ดอกสีชมพูเกิดจากการข่มไม่สมบูรณ์ระหว่างแอลลีลสีแดงและขาว คือ CᴿCᵂ" },
+                parent2: { label: "แม่: ดอกสีชมพู", icon: "🌸", options: ["CᴿCᴿ", "CᴿCᵂ", "CᵂCᵂ"], correct: "CᴿCᵂ", reason: "ดอกสีชมพูมีจีโนไทป์เป็นพันธุ์ทาง คือ CᴿCᵂ" },
+                gametes1: { label: "เซลล์สืบพันธุ์ของพ่อ (CᴿCᵂ)", choices: ["Cᴿ", "Cᵂ", "CᴿCᵂ"], correct: ["Cᴿ", "Cᵂ"] },
+                gametes2: { label: "เซลล์สืบพันธุ์ของแม่ (CᴿCᵂ)", choices: ["Cᴿ", "Cᵂ", "CᴿCᵂ"], correct: ["Cᴿ", "Cᵂ"] },
+                topSlots: ["Cᴿ", "Cᵂ"],
+                leftSlots: ["Cᴿ", "Cᵂ"],
+                cells: [
+                    { genotype: "CᴿCᴿ", phenotype: "ดอกสีแดง", icon: "🌺" },
+                    { genotype: "CᴿCᵂ", phenotype: "ดอกสีชมพู", icon: "🌸" },
+                    { genotype: "CᴿCᵂ", phenotype: "ดอกสีชมพู", icon: "🌸" },
+                    { genotype: "CᵂCᵂ", phenotype: "ดอกสีขาว", icon: "🤍" }
+                ],
+                offspringTiles: ["CᴿCᴿ", "CᴿCᵂ", "CᵂCᵂ"],
+                genoRatio: {
+                    question: "อัตราส่วนจีโนไทป์ของรุ่นลูก (CᴿCᴿ : CᴿCᵂ : CᵂCᵂ) คือข้อใด?",
+                    options: ["1 : 2 : 1", "3 : 1", "1 : 1", "2 : 2"],
+                    correct: "1 : 2 : 1",
+                    reason: "ได้จีโนไทป์ CᴿCᴿ (1) : CᴿCᵂ (2) : CᵂCᵂ (1)"
+                },
+                phenoRatio: {
+                    question: "อัตราส่วนฟีโนไทป์ของรุ่นลูก (สีแดง : สีชมพู : สีขาว) คือข้อใด?",
+                    options: ["1 : 2 : 1", "3 : 1", "2 : 1 : 1", "สีชมพูทั้งหมด 100%"],
+                    correct: "1 : 2 : 1",
+                    reason: "ในการข่มไม่สมบูรณ์ อัตราส่วนฟีโนไทป์จะตรงกับอัตราส่วนจีโนไทป์ คือ แดง 1 : ชมพู 2 : ขาว 1"
+                }
+            },
+            {
+                id: 4,
+                badge: "ภารกิจที่ 4 / 5 • การทดสอบพันธุ์ (Test Cross)",
+                title: "ถั่วลันเตาเมล็ดเรียบพันธุ์ทาง × เมล็ดขรุขระ",
+                story: "ทำการทดสอบพันธุ์ (Test Cross) โดยนำถั่วลันเตา <strong>เมล็ดเรียบพันธุ์ทาง</strong> ผสมกับ <strong>เมล็ดขรุขระ</strong>",
+                legend: "กำหนด: R = เมล็ดเรียบ (เด่น), r = เมล็ดขรุขระ (ด้อย)",
+                parent1: { label: "พ่อ: เมล็ดเรียบพันธุ์ทาง", icon: "🟡", options: ["RR", "Rr", "rr"], correct: "Rr", reason: "เมล็ดเรียบพันธุ์ทาง คือ Rr" },
+                parent2: { label: "แม่: เมล็ดขรุขระ", icon: "🥔", options: ["RR", "Rr", "rr"], correct: "rr", reason: "เมล็ดขรุขระเป็นลักษณะด้อย คือ rr" },
+                gametes1: { label: "เซลล์สืบพันธุ์ของพ่อ (Rr)", choices: ["R", "r", "Rr", "RR"], correct: ["R", "r"] },
+                gametes2: { label: "เซลล์สืบพันธุ์ของแม่ (rr)", choices: ["r", "R", "rr"], correct: ["r"], uniqueGametes: ["r"] },
+                topSlots: ["R", "r"],
+                leftSlots: ["r", "r"],
+                cells: [
+                    { genotype: "Rr", phenotype: "เมล็ดเรียบ", icon: "🟡" },
+                    { genotype: "rr", phenotype: "เมล็ดขรุขระ", icon: "🥔" },
+                    { genotype: "Rr", phenotype: "เมล็ดเรียบ", icon: "🟡" },
+                    { genotype: "rr", phenotype: "เมล็ดขรุขระ", icon: "🥔" }
+                ],
+                offspringTiles: ["RR", "Rr", "rr"],
+                genoRatio: {
+                    question: "อัตราส่วนจีโนไทป์ของรุ่นลูก (Rr : rr) คือข้อใด?",
+                    options: ["1 : 1", "3 : 1", "1 : 2 : 1", "1 : 0"],
+                    correct: "1 : 1",
+                    reason: "ได้ Rr จำนวน 2 ช่อง และ rr จำนวน 2 ช่อง คิดเป็นอัตราส่วน 1 : 1"
+                },
+                phenoRatio: {
+                    question: "อัตราส่วนฟีโนไทป์ของรุ่นลูก (เมล็ดเรียบ : เมล็ดขรุขระ) คือข้อใด?",
+                    options: ["เมล็ดเรียบ : เมล็ดขรุขระ = 1 : 1", "เมล็ดเรียบ : เมล็ดขรุขระ = 3 : 1", "เมล็ดเรียบทั้งหมด", "เมล็ดขรุขระทั้งหมด"],
+                    correct: "เมล็ดเรียบ : เมล็ดขรุขระ = 1 : 1",
+                    reason: "ลูกมีโอกาสเกิดเมล็ดเรียบ 50% และเมล็ดขรุขระ 50% (อัตราส่วน 1 : 1)"
+                }
+            },
+            {
+                id: 5,
+                badge: "ภารกิจที่ 5 / 5 • บอสไฟต์! Dihybrid Cross (2 ลักษณะ)",
+                title: "ต้นสูงพันธุ์ทางเมล็ดขรุขระ × ต้นเตี้ยเมล็ดเรียบพันธุ์ทาง",
+                story: "ผสมถั่วลันเตา 2 ลักษณะพร้อมกัน: <strong>พ่อต้นสูงพันธุ์ทาง เมล็ดขรุขระ</strong> ผสมกับ <strong>แม่ต้นเตี้ย เมล็ดเรียบพันธุ์ทาง</strong>",
+                legend: "กำหนด: T = สูง, t = เตี้ย | R = เมล็ดเรียบ, r = เมล็ดขรุขระ",
+                parent1: { label: "พ่อ: สูงพันธุ์ทาง เมล็ดขรุขระ", icon: "🌱🥔", options: ["TTRR", "Ttrr", "ttRr", "TtRr"], correct: "Ttrr", reason: "สูงพันธุ์ทาง (Tt) + เมล็ดขรุขระ (rr) รวมเป็น Ttrr" },
+                parent2: { label: "แม่: ต้นเตี้ย เมล็ดเรียบพันธุ์ทาง", icon: "🌿🟡", options: ["ttRr", "ttrr", "Ttrr", "ttRR"], correct: "ttRr", reason: "ต้นเตี้ย (tt) + เมล็ดเรียบพันธุ์ทาง (Rr) รวมเป็น ttRr" },
+                gametes1: { label: "เซลล์สืบพันธุ์ของพ่อ (Ttrr)", choices: ["Tr", "tr", "Tt", "rr", "TR"], correct: ["Tr", "tr"] },
+                gametes2: { label: "เซลล์สืบพันธุ์ของแม่ (ttRr)", choices: ["tR", "tr", "tt", "Rr", "TR"], correct: ["tR", "tr"] },
+                topSlots: ["Tr", "tr"],
+                leftSlots: ["tR", "tr"],
+                cells: [
+                    { genotype: "TtRr", phenotype: "สูง เมล็ดเรียบ", icon: "🌱🟡" },
+                    { genotype: "ttRr", phenotype: "เตี้ย เมล็ดเรียบ", icon: "🌿🟡" },
+                    { genotype: "Ttrr", phenotype: "สูง เมล็ดขรุขระ", icon: "🌱🥔" },
+                    { genotype: "ttrr", phenotype: "เตี้ย เมล็ดขรุขระ", icon: "🌿🥔" }
+                ],
+                offspringTiles: ["TtRr", "ttRr", "Ttrr", "ttrr"],
+                genoRatio: {
+                    question: "อัตราส่วนจีโนไทป์ของรุ่นลูก (TtRr : ttRr : Ttrr : ttrr) คือข้อใด?",
+                    options: ["1 : 1 : 1 : 1", "9 : 3 : 3 : 1", "3 : 1", "1 : 2 : 1"],
+                    correct: "1 : 1 : 1 : 1",
+                    reason: "ลูกทั้ง 4 ช่องมีจีโนไทป์แตกต่างกันทั้งหมดอย่างละ 1 ช่อง ได้อัตราส่วน 1 : 1 : 1 : 1"
+                },
+                phenoRatio: {
+                    question: "โอกาสที่จะได้ลูกที่มีลักษณะ 'ต้นสูง เมล็ดเรียบ' คิดเป็นร้อยละเท่าใด?",
+                    options: ["ร้อยละ 25 (1 ใน 4)", "ร้อยละ 50 (2 ใน 4)", "ร้อยละ 75 (3 ใน 4)", "ร้อยละ 100"],
+                    correct: "ร้อยละ 25 (1 ใน 4)",
+                    reason: "มีเพียงช่องเดียว (TtRr) ที่แสดงลักษณะต้นสูง เมล็ดเรียบ จากทั้งหมด 4 ช่อง คิดเป็นร้อยละ 25"
+                }
+            }
+        ];
+
+        // ==========================================
+        // 3. STATE MANAGEMENT
+        // ==========================================
+        let state = {
+            studentName: "",
+            studentClass: "",
+            missionIdx: 0,
+            step: 1, // 1: Parents, 2: Gametes, 3: Punnett, 4: Ratios
+            totalScore: 0,
+            skillScores: { step1: 0, step2: 0, step3: 0, step4: 0 }, // max 25 each = 100
+            // Temp selections per step
+            selP1: null,
+            selP2: null,
+            selG1: [],
+            selG2: [],
+            // Punnett Square state
+            punnettPhase: "headers", // "headers" -> "cells"
+            selectedTileValue: null,
+            selectedTileSource: null, // "p1" | "p2" | "offspring"
+            placedTop: [null, null],
+            placedLeft: [null, null],
+            placedCells: [null, null, null, null],
+            selGenoRatio: null,
+            selPhenoRatio: null
+        };
+
+        // ==========================================
+        // 4. START & NAVIGATION
+        // ==========================================
+        function startLab(e) {
+            e.preventDefault();
+            playTone('click');
+            state.studentName = document.getElementById('stu-name').value.trim();
+            state.studentClass = document.getElementById('stu-class').value.trim();
+
+            document.getElementById('header-score-pill').classList.remove('hidden');
+            updateScoreUI();
+
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-lab').classList.remove('hidden');
+            loadMission(0);
+        }
+
+        function updateScoreUI() {
+            document.getElementById('header-score-val').textContent = state.totalScore;
+        }
+
+        function addScore(stepKey, pts) {
+            state.totalScore += pts;
+            state.skillScores[stepKey] += pts;
+            updateScoreUI();
+        }
+
+        function loadMission(idx) {
+            state.missionIdx = idx;
+            state.step = 1;
+            state.selP1 = null;
+            state.selP2 = null;
+            state.selG1 = [];
+            state.selG2 = [];
+            state.punnettPhase = "headers";
+            state.selectedTileValue = null;
+            state.placedTop = [null, null];
+            state.placedLeft = [null, null];
+            state.placedCells = [null, null, null, null];
+            state.selGenoRatio = null;
+            state.selPhenoRatio = null;
+
+            const m = MISSIONS[idx];
+            document.getElementById('mission-badge').textContent = m.badge;
+            document.getElementById('mission-title').textContent = m.title;
+            document.getElementById('mission-story').innerHTML = m.story;
+            document.getElementById('mission-legend').innerHTML = `<i class="fas fa-key text-amber-600 mr-1.5"></i>${m.legend}`;
+
+            // Render mission dots
+            const dotsEl = document.getElementById('mission-dots');
+            dotsEl.innerHTML = MISSIONS.map((_, i) => `
+                <span class="w-3 h-3 rounded-full ${i < idx ? 'bg-emerald-500' : i === idx ? 'bg-amber-400 ring-2 ring-amber-200' : 'bg-slate-200'}"></span>
+            `).join('');
+
+            renderStep();
+        }
+
+        function updateStepPills() {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`step-pill-${i}`);
+                if (i < state.step) {
+                    el.className = "step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold bg-emerald-100 text-emerald-800";
+                } else if (i === state.step) {
+                    el.className = "step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold bg-emerald-600 text-white shadow-sm";
+                } else {
+                    el.className = "step-pill text-center py-2 px-1 rounded-xl text-xs font-prompt font-bold bg-slate-100 text-slate-400";
+                }
+            }
+        }
+
+        // ==========================================
+        // 5. RENDER EACH STEP (1 TO 4)
+        // ==========================================
+        function renderStep() {
+            updateStepPills();
+            const ws = document.getElementById('step-workspace');
+            const m = MISSIONS[state.missionIdx];
+
+            // ---------------- STEP 1: PARENTS (P) ----------------
+            if (state.step === 1) {
+                ws.innerHTML = `
+                    <div class="space-y-6 animate-pop">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">ขั้นตอนที่ 1 จาก 4</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">ระบุจีโนไทป์ของรุ่นพ่อแม่ (Parental Generation: P)</h3>
+                            <p class="text-xs sm:text-sm text-slate-500">เลือกจีโนไทป์ของพ่อและแม่ให้ตรงกับลักษณะที่โจทย์กำหนด</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Parent 1 -->
+                            <div class="bg-emerald-50/60 border-2 border-emerald-200 rounded-2xl p-5 text-center space-y-3">
+                                <div class="text-4xl">${m.parent1.icon}</div>
+                                <h4 class="font-prompt font-bold text-base text-emerald-900">${m.parent1.label}</h4>
+                                <div class="flex flex-wrap justify-center gap-2 pt-2">
+                                    ${m.parent1.options.map(opt => `
+                                        <button type="button" onclick="selectParent(1, '${opt}')" 
+                                                class="px-5 py-2.5 rounded-xl font-prompt font-bold text-base border-2 transition ${
+                                                    state.selP1 === opt 
+                                                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-md scale-105' 
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400'
+                                                }">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Parent 2 -->
+                            <div class="bg-amber-50/60 border-2 border-amber-200 rounded-2xl p-5 text-center space-y-3">
+                                <div class="text-4xl">${m.parent2.icon}</div>
+                                <h4 class="font-prompt font-bold text-base text-amber-900">${m.parent2.label}</h4>
+                                <div class="flex flex-wrap justify-center gap-2 pt-2">
+                                    ${m.parent2.options.map(opt => `
+                                        <button type="button" onclick="selectParent(2, '${opt}')" 
+                                                class="px-5 py-2.5 rounded-xl font-prompt font-bold text-base border-2 transition ${
+                                                    state.selP2 === opt 
+                                                    ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-105' 
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'
+                                                }">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="verifyStep1()" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-prompt font-bold rounded-2xl shadow-md transition">
+                                <i class="fas fa-check mr-2"></i>ตรวจสอบจีโนไทป์รุ่นพ่อแม่
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ---------------- STEP 2: GAMETES ----------------
+            else if (state.step === 2) {
+                const reqG2 = m.gametes2.uniqueGametes || m.gametes2.correct;
+                ws.innerHTML = `
+                    <div class="space-y-6 animate-pop">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full">ขั้นตอนที่ 2 จาก 4</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">สร้างเซลล์สืบพันธุ์ (Gamete Formation)</h3>
+                            <p class="text-xs sm:text-sm text-slate-500">กดเลือกเซลล์สืบพันธุ์ที่เป็นไปได้ <strong>ทั้งหมด</strong> ของพ่อและแม่ตามกฎของเมนเดล</p>
+                        </div>
+
+                        <!-- Mendel Rule Live Warning -->
+                        <div id="mendel-alert-box" class="hidden bg-rose-100 border-2 border-rose-400 text-rose-800 p-3.5 rounded-2xl text-xs sm:text-sm font-semibold flex items-center space-x-2 animate-shake">
+                            <i class="fas fa-exclamation-triangle text-rose-600 text-lg"></i>
+                            <span id="mendel-alert-msg"></span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Parent 1 Gametes -->
+                            <div class="bg-emerald-50/50 border-2 border-emerald-200 rounded-2xl p-5 text-center space-y-3">
+                                <span class="text-xs font-bold bg-emerald-600 text-white px-3 py-1 rounded-full">พ่อ: ${m.parent1.correct}</span>
+                                <h4 class="font-prompt font-bold text-sm sm:text-base text-slate-800">${m.gametes1.label}</h4>
+                                <div class="flex flex-wrap justify-center gap-2.5 pt-1">
+                                    ${m.gametes1.choices.map(ch => `
+                                        <button type="button" onclick="toggleGamete(1, '${ch}')" 
+                                                class="w-16 h-16 rounded-full font-prompt font-bold text-base border-2 transition flex flex-col items-center justify-center ${
+                                                    state.selG1.includes(ch)
+                                                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-md scale-105'
+                                                    : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-400'
+                                                }">
+                                            <span class="text-[10px] opacity-75 font-normal">n</span>
+                                            <span>${ch}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Parent 2 Gametes -->
+                            <div class="bg-amber-50/50 border-2 border-amber-200 rounded-2xl p-5 text-center space-y-3">
+                                <span class="text-xs font-bold bg-amber-500 text-white px-3 py-1 rounded-full">แม่: ${m.parent2.correct}</span>
+                                <h4 class="font-prompt font-bold text-sm sm:text-base text-slate-800">${m.gametes2.label}</h4>
+                                <div class="flex flex-wrap justify-center gap-2.5 pt-1">
+                                    ${m.gametes2.choices.map(ch => `
+                                        <button type="button" onclick="toggleGamete(2, '${ch}')" 
+                                                class="w-16 h-16 rounded-full font-prompt font-bold text-base border-2 transition flex flex-col items-center justify-center ${
+                                                    state.selG2.includes(ch)
+                                                    ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-105'
+                                                    : 'bg-white text-slate-700 border-slate-300 hover:border-amber-400'
+                                                }">
+                                            <span class="text-[10px] opacity-75 font-normal">n</span>
+                                            <span>${ch}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="verifyStep2()" class="px-8 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-prompt font-bold rounded-2xl shadow-md transition">
+                                <i class="fas fa-vials mr-2"></i>ตรวจสอบเซลล์สืบพันธุ์
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ---------------- STEP 3: PUNNETT SQUARE (DRAG & TAP) ----------------
+            else if (state.step === 3) {
+                const isHeadersPhase = state.punnettPhase === "headers";
+                
+                ws.innerHTML = `
+                    <div class="space-y-5 animate-pop">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">ขั้นตอนที่ 3 จาก 4 • ตารางพันเนต (Punnett Square)</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">
+                                ${isHeadersPhase 
+                                    ? 'ขั้นที่ 3.1: นำเซลล์สืบพันธุ์ของพ่อและแม่วางที่หัวตาราง' 
+                                    : 'ขั้นที่ 3.2: ผสมเซลล์สืบพันธุ์และวางจีโนไทป์ของรุ่นลูก (F₁) ในช่องตาราง'}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500">
+                                <i class="fas fa-hand-pointer text-amber-600 mr-1"></i> <strong>วิธีเล่น:</strong> ลากป้ายด้านล่างไปวางในช่อง หรือ <strong>แตะเลือกป้าย แล้วแตะช่องว่างที่ต้องการวาง</strong>
+                            </p>
+                        </div>
+
+                        <!-- PUNNETT SQUARE 2x2 GRID -->
+                        <div class="max-w-md mx-auto bg-slate-50 p-3 sm:p-5 rounded-3xl border-2 border-slate-200 shadow-inner">
+                            <div class="grid grid-cols-3 gap-2 sm:gap-3 items-center text-center">
+                                <!-- Top-Left Corner Label -->
+                                <div class="h-16 sm:h-20 rounded-2xl bg-slate-200/80 flex flex-col items-center justify-center p-1 text-xs font-bold text-slate-600">
+                                    <span>แม่ \ พ่อ</span>
+                                    <span class="text-[10px] font-normal text-slate-500">${m.parent2.correct} × ${m.parent1.correct}</span>
+                                </div>
+
+                                <!-- Top Headers (Parent 1 Gametes) -->
+                                ${[0, 1].map(colIdx => {
+                                    const val = state.placedTop[colIdx];
+                                    return `
+                                        <div onclick="handleSlotClick('top', ${colIdx})"
+                                             ondragover="allowDrop(event)" 
+                                             ondrop="handleDrop(event, 'top', ${colIdx})"
+                                             class="h-16 sm:h-20 rounded-2xl border-2 ${
+                                                val 
+                                                ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm' 
+                                                : 'bg-emerald-50/70 border-dashed border-emerald-400 hover:bg-emerald-100/70 cursor-pointer'
+                                             } flex flex-col items-center justify-center transition">
+                                            ${val 
+                                                ? `<span class="text-[10px] text-emerald-200">เซลล์สืบพันธุ์พ่อ</span><span class="font-prompt font-bold text-lg sm:text-xl">${val}</span>` 
+                                                : `<span class="text-xs text-emerald-600 font-semibold">+ วางของพ่อ</span>`
+                                            }
+                                        </div>
+                                    `;
+                                }).join('')}
+
+                                <!-- Row 0 & Row 1 -->
+                                ${[0, 1].map(rowIdx => {
+                                    const leftVal = state.placedLeft[rowIdx];
+                                    return `
+                                        <!-- Left Header (Parent 2 Gamete) -->
+                                        <div onclick="handleSlotClick('left', ${rowIdx})"
+                                             ondragover="allowDrop(event)" 
+                                             ondrop="handleDrop(event, 'left', ${rowIdx})"
+                                             class="h-24 sm:h-28 rounded-2xl border-2 ${
+                                                leftVal 
+                                                ? 'bg-amber-500 text-white border-amber-600 shadow-sm' 
+                                                : 'bg-amber-50/70 border-dashed border-amber-400 hover:bg-amber-100/70 cursor-pointer'
+                                             } flex flex-col items-center justify-center transition p-1">
+                                            ${leftVal 
+                                                ? `<span class="text-[10px] text-amber-100">เซลล์สืบพันธุ์แม่</span><span class="font-prompt font-bold text-lg sm:text-xl">${leftVal}</span>` 
+                                                : `<span class="text-xs text-amber-700 font-semibold">+ วางของแม่</span>`
+                                            }
+                                        </div>
+
+                                        <!-- 2 Offspring Cells in this row -->
+                                        ${[0, 1].map(colIdx => {
+                                            const cellIdx = rowIdx * 2 + colIdx;
+                                            const cellVal = state.placedCells[cellIdx];
+                                            const cellInfo = m.cells[cellIdx];
+                                            return `
+                                                <div onclick="handleSlotClick('cell', ${cellIdx})"
+                                                     ondragover="allowDrop(event)" 
+                                                     ondrop="handleDrop(event, 'cell', ${cellIdx})"
+                                                     class="h-24 sm:h-28 rounded-2xl border-2 ${
+                                                        cellVal 
+                                                        ? 'bg-white border-teal-500 shadow-md animate-pop' 
+                                                        : isHeadersPhase 
+                                                            ? 'bg-slate-100 border-slate-200 opacity-50' 
+                                                            : 'bg-white border-dashed border-teal-400 hover:bg-teal-50 cursor-pointer'
+                                                     } flex flex-col items-center justify-center p-1 transition">
+                                                    ${cellVal 
+                                                        ? `<span class="text-xl sm:text-2xl mb-0.5">${cellInfo.icon}</span>
+                                                           <span class="font-prompt font-bold text-base sm:text-lg text-slate-800">${cellVal}</span>
+                                                           <span class="text-[10px] text-teal-700 font-semibold leading-tight">${cellInfo.phenotype}</span>` 
+                                                        : `<span class="text-xs text-slate-400">${isHeadersPhase ? 'รอก่อน' : '+ วางรุ่นลูก'}</span>`
+                                                    }
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- TILE TRAY (DRAGGABLE / TAPPABLE ITEMS) -->
+                        <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 text-center space-y-2.5">
+                            ${isHeadersPhase ? `
+                                <p class="text-xs font-bold text-slate-600">คลังป้ายเซลล์สืบพันธุ์ (เลือกหรือลากไปวางที่หัวตารางด้านบนและด้านซ้าย)</p>
+                                <div class="flex flex-wrap justify-center gap-4">
+                                    <!-- Parent 1 Gamete Tiles -->
+                                    <div class="flex items-center space-x-2 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                                        <span class="text-xs font-bold text-emerald-800">พ่อ (${m.parent1.correct}):</span>
+                                        ${m.topSlots.map((g, i) => `
+                                            <button type="button" draggable="true" 
+                                                    ondragstart="handleDragStart(event, 'p1', '${g}')"
+                                                    onclick="selectTile('p1', '${g}')"
+                                                    class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-prompt font-bold text-sm shadow cursor-grab active:cursor-grabbing transition ${
+                                                        state.selectedTileSource === 'p1' && state.selectedTileValue === g ? 'ring-4 ring-amber-400 scale-105' : ''
+                                                    }">
+                                                ${g}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+
+                                    <!-- Parent 2 Gamete Tiles -->
+                                    <div class="flex items-center space-x-2 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
+                                        <span class="text-xs font-bold text-amber-800">แม่ (${m.parent2.correct}):</span>
+                                        ${m.leftSlots.map((g, i) => `
+                                            <button type="button" draggable="true" 
+                                                    ondragstart="handleDragStart(event, 'p2', '${g}')"
+                                                    onclick="selectTile('p2', '${g}')"
+                                                    class="px-4 py-2 rounded-xl bg-amber-500 text-white font-prompt font-bold text-sm shadow cursor-grab active:cursor-grabbing transition ${
+                                                        state.selectedTileSource === 'p2' && state.selectedTileValue === g ? 'ring-4 ring-emerald-500 scale-105' : ''
+                                                    }">
+                                                ${g}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : `
+                                <p class="text-xs font-bold text-slate-600">คลังจีโนไทป์รุ่นลูก (F₁) — เลือกหรือลากไปวางในช่องตารางพันเนตให้ถูกต้อง</p>
+                                <div class="flex flex-wrap justify-center gap-3">
+                                    ${m.offspringTiles.map(gt => `
+                                        <button type="button" draggable="true" 
+                                                ondragstart="handleDragStart(event, 'offspring', '${gt}')"
+                                                onclick="selectTile('offspring', '${gt}')"
+                                                class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-prompt font-bold text-base shadow cursor-grab active:cursor-grabbing transition ${
+                                                    state.selectedTileSource === 'offspring' && state.selectedTileValue === gt ? 'ring-4 ring-amber-400 scale-105' : ''
+                                                }">
+                                            ${gt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ---------------- STEP 4: OFFSPRING RATIOS ----------------
+            else if (state.step === 4) {
+                ws.innerHTML = `
+                    <div class="space-y-6 animate-pop">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-lime-800 bg-lime-100 px-3 py-1 rounded-full">ขั้นตอนที่ 4 จาก 4 • วิเคราะห์ผลรุ่นลูก (F₁)</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">สรุปอัตราส่วนจีโนไทป์และฟีโนไทป์ของรุ่นลูก</h3>
+                        </div>
+
+                        <!-- Completed Punnett Mini Summary Strip -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                            ${m.cells.map((c, idx) => `
+                                <div class="bg-white p-2.5 rounded-xl border border-teal-200 text-center shadow-sm">
+                                    <span class="text-xs text-slate-400 block">ช่องที่ ${idx + 1}</span>
+                                    <span class="text-xl">${c.icon}</span>
+                                    <strong class="block font-prompt text-sm text-slate-800">${c.genotype}</strong>
+                                    <span class="text-[11px] text-teal-700 font-semibold">${c.phenotype}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Genotype Ratio Question -->
+                            <div class="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-4 space-y-3">
+                                <h4 class="font-prompt font-bold text-sm sm:text-base text-emerald-950">1. ${m.genoRatio.question}</h4>
+                                <div class="space-y-2">
+                                    ${m.genoRatio.options.map(opt => `
+                                        <button type="button" onclick="selectRatio('geno', '${opt}')" 
+                                                class="w-full p-3 rounded-xl border-2 text-left text-sm font-semibold transition ${
+                                                    state.selGenoRatio === opt 
+                                                    ? 'bg-emerald-600 text-white border-emerald-700 shadow' 
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400'
+                                                }">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Phenotype Ratio Question -->
+                            <div class="bg-amber-50/50 border border-amber-200 rounded-2xl p-4 space-y-3">
+                                <h4 class="font-prompt font-bold text-sm sm:text-base text-amber-950">2. ${m.phenoRatio.question}</h4>
+                                <div class="space-y-2">
+                                    ${m.phenoRatio.options.map(opt => `
+                                        <button type="button" onclick="selectRatio('pheno', '${opt}')" 
+                                                class="w-full p-3 rounded-xl border-2 text-left text-sm font-semibold transition ${
+                                                    state.selPhenoRatio === opt 
+                                                    ? 'bg-amber-500 text-white border-amber-600 shadow' 
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-amber-400'
+                                                }">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="verifyStep4()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-prompt font-bold rounded-2xl shadow-lg transition">
+                                <i class="fas fa-flag-checkered mr-2"></i>ส่งสรุปผลภารกิจนี้
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // 6. INTERACTION & VERIFICATION HANDLERS
+        // ==========================================
+
+        // --- Step 1 Handlers ---
+        function selectParent(pNum, val) {
+            playTone('click');
+            if (pNum === 1) state.selP1 = val;
+            if (pNum === 2) state.selP2 = val;
+            renderStep();
+        }
+
+        function verifyStep1() {
+            const m = MISSIONS[state.missionIdx];
+            if (!state.selP1 || !state.selP2) {
+                playTone('err');
+                showFeedbackModal(false, "กรุณาเลือกให้ครบ", "กรุณาเลือกจีโนไทป์ของทั้งพ่อและแม่ก่อนกดตรวจสอบค่ะ", null);
+                return;
+            }
+            if (state.selP1 === m.parent1.correct && state.selP2 === m.parent2.correct) {
+                playTone('ok');
+                addScore('step1', 5);
+                showFeedbackModal(true, "ถอดรหัสรุ่นพ่อแม่ถูกต้อง! (+5 คะแนน)", `• ${m.parent1.reason}<br>• ${m.parent2.reason}`, () => {
+                    state.step = 2;
+                    renderStep();
+                });
+            } else {
+                playTone('err');
+                showFeedbackModal(false, "ยังไม่ถูกต้อง ลองทบทวนอีกครั้ง", `• ${m.parent1.reason}<br>• ${m.parent2.reason}`, null);
+            }
+        }
+
+        // --- Step 2 Handlers ---
+        function hasDuplicateLocus(gamete) {
+            // Check if same letter appears twice (case-insensitive), e.g., Tt, TT, Rr, rr
+            const clean = gamete.replace(/[ᴿᵂ]/g, ''); // ignore superscripts for CR/CW
+            if (gamete === "CᴿCᵂ") return "C";
+            const seen = new Set();
+            for (let ch of clean.toLowerCase()) {
+                if (seen.has(ch)) return ch.toUpperCase();
+                seen.add(ch);
+            }
+            return null;
+        }
+
+        function toggleGamete(pNum, val) {
+            const dup = hasDuplicateLocus(val);
+            const alertBox = document.getElementById('mendel-alert-box');
+            const alertMsg = document.getElementById('mendel-alert-msg');
+
+            if (dup) {
+                playTone('err');
+                alertMsg.innerHTML = `กฎข้อที่ 1 ของเมนเดล (กฎแห่งการแยก): แอลลีลของยีนเดียวกันต้องแยกออกจากกัน ห้ามอยู่ในเซลล์สืบพันธุ์เดียวกัน (${val})!`;
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            alertBox.classList.add('hidden');
+            playTone('click');
+
+            const targetArr = pNum === 1 ? state.selG1 : state.selG2;
+            const idx = targetArr.indexOf(val);
+            if (idx > -1) targetArr.splice(idx, 1);
+            else targetArr.push(val);
+
+            renderStep();
+        }
+
+        function verifyStep2() {
+            const m = MISSIONS[state.missionIdx];
+            const req1 = [...m.gametes1.correct].sort().join(',');
+            const req2 = [...(m.gametes2.uniqueGametes || m.gametes2.correct)].sort().join(',');
+
+            const u1 = [...state.selG1].sort().join(',');
+            const u2 = [...state.selG2].sort().join(',');
+
+            if (u1 === req1 && u2 === req2) {
+                playTone('ok');
+                addScore('step2', 5);
+                showFeedbackModal(true, "สร้างเซลล์สืบพันธุ์ถูกต้อง! (+5 คะแนน)", `พ่อ (${m.parent1.correct}) สร้างเซลล์สืบพันธุ์ได้คือ <strong>${m.gametes1.correct.join(', ')}</strong> และแม่ (${m.parent2.correct}) สร้างได้คือ <strong>${(m.gametes2.uniqueGametes || m.gametes2.correct).join(', ')}</strong>`, () => {
+                    state.step = 3;
+                    renderStep();
+                });
+            } else {
+                playTone('err');
+                showFeedbackModal(false, "จำนวนหรือชนิดเซลล์สืบพันธุ์ยังไม่ครบถ้วน", `คำแนะนำ: ให้แยกแอลลีลแต่ละคู่ของพ่อ (${m.parent1.correct}) และแม่ (${m.parent2.correct}) ออกจากกันแล้วจับคู่กันอย่างอิสระ`, null);
+            }
+        }
+
+        // --- Step 3 Handlers (Drag & Drop + Tap-to-Place) ---
+        function selectTile(source, val) {
+            playTone('click');
+            state.selectedTileSource = source;
+            state.selectedTileValue = val;
+            renderStep();
+        }
+
+        function handleDragStart(e, source, val) {
+            state.selectedTileSource = source;
+            state.selectedTileValue = val;
+            e.dataTransfer.setData("text/plain", JSON.stringify({ source, val }));
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e, zoneType, index) {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+                state.selectedTileSource = data.source;
+                state.selectedTileValue = data.val;
+            } catch (err) {}
+            placeTileInSlot(zoneType, index);
+        }
+
+        function handleSlotClick(zoneType, index) {
+            if (!state.selectedTileValue) {
+                playTone('err');
+                return;
+            }
+            placeTileInSlot(zoneType, index);
+        }
+
+        function placeTileInSlot(zoneType, index) {
+            const m = MISSIONS[state.missionIdx];
+            const src = state.selectedTileSource;
+            const val = state.selectedTileValue;
+
+            // Phase 1: Placing Headers
+            if (state.punnettPhase === "headers") {
+                if (zoneType === 'top') {
+                    if (src !== 'p1') {
+                        playTone('err');
+                        showFeedbackModal(false, "วางสลับฝั่ง!", "แถวด้านบนสุดสำหรับวางเซลล์สืบพันธุ์ของ <strong>พ่อ</strong> ค่ะ", null);
+                        return;
+                    }
+                    // Check if matches expected topSlot (or allow either order if valid gamete of p1)
+                    if (val === m.topSlots[index]) {
+                        playTone('ok');
+                        state.placedTop[index] = val;
+                        state.selectedTileValue = null;
+                    } else {
+                        playTone('err');
+                        showFeedbackModal(false, "ลองวางอีกช่องหนึ่ง", `ลองนำ <strong>${val}</strong> ไปวางในช่องหัวตารางด้านบนอีกช่องดูนะคะ`, null);
+                        return;
+                    }
+                } else if (zoneType === 'left') {
+                    if (src !== 'p2') {
+                        playTone('err');
+                        showFeedbackModal(false, "วางสลับฝั่ง!", "คอลัมน์ด้านซ้ายสุดสำหรับวางเซลล์สืบพันธุ์ของ <strong>แม่</strong> ค่ะ", null);
+                        return;
+                    }
+                    if (val === m.leftSlots[index]) {
+                        playTone('ok');
+                        state.placedLeft[index] = val;
+                        state.selectedTileValue = null;
+                    } else {
+                        playTone('err');
+                        showFeedbackModal(false, "ลองวางอีกช่องหนึ่ง", `ลองนำ <strong>${val}</strong> ไปวางในช่องด้านซ้ายอีกช่องดูนะคะ`, null);
+                        return;
+                    }
+                } else {
+                    playTone('err');
+                    return;
+                }
+
+                // Check if all 4 headers placed
+                if (state.placedTop[0] && state.placedTop[1] && state.placedLeft[0] && state.placedLeft[1]) {
+                    state.punnettPhase = "cells";
+                    state.selectedTileValue = null;
+                    playTone('ok');
+                }
+                renderStep();
+            }
+
+            // Phase 2: Placing Offspring Genotypes in 2x2 Grid
+            else if (state.punnettPhase === "cells" && zoneType === 'cell') {
+                if (src !== 'offspring') return;
+                const expectedGeno = m.cells[index].genotype;
+                const rowIdx = Math.floor(index / 2);
+                const colIdx = index % 2;
+                const gParent1 = state.placedTop[colIdx];
+                const gParent2 = state.placedLeft[rowIdx];
+
+                if (val === expectedGeno) {
+                    playTone('ok');
+                    state.placedCells[index] = val;
+                    state.selectedTileValue = null;
+                    renderStep();
+
+                    // Check if all 4 cells completed!
+                    if (state.placedCells.every(c => c !== null)) {
+                        addScore('step3', 10);
+                        setTimeout(() => {
+                            showFeedbackModal(true, "สร้างตารางพันเนตสมบูรณ์! (+10 คะแนน)", "ยอดเยี่ยมมาก! นักเรียนผสมเซลล์สืบพันธุ์ของพ่อและแม่ลงในตารางพันเนตครบทั้ง 4 ช่องแล้ว ไปสรุปอัตราส่วนรุ่นลูกกันต่อเลยค่ะ", () => {
+                                state.step = 4;
+                                renderStep();
+                            });
+                        }, 450);
+                    }
+                } else {
+                    playTone('err');
+                    showFeedbackModal(false, "คู่จีโนไทป์ยังไม่ตรงช่องนี้", `ช่องนี้เกิดจากการรวมกันระหว่างเซลล์สืบพันธุ์ของแม่ (<strong>${gParent2}</strong>) กับของพ่อ (<strong>${gParent1}</strong>) ลองเลือกจีโนไทป์ที่เกิดจากคู่นี้อีกครั้งค่ะ`, null);
+                }
+            }
+        }
+
+        // --- Step 4 Handlers ---
+        function selectRatio(type, val) {
+            playTone('click');
+            if (type === 'geno') state.selGenoRatio = val;
+            if (type === 'pheno') state.selPhenoRatio = val;
+            renderStep();
+        }
+
+        function verifyStep4() {
+            const m = MISSIONS[state.missionIdx];
+            if (!state.selGenoRatio || !state.selPhenoRatio) {
+                playTone('err');
+                showFeedbackModal(false, "กรุณาตอบให้ครบทั้ง 2 ข้อ", "เลือกอัตราส่วนจีโนไทป์และอัตราส่วนฟีโนไทป์ให้ครบก่อนกดส่งนะคะ", null);
+                return;
+            }
+
+            if (state.selGenoRatio === m.genoRatio.correct && state.selPhenoRatio === m.phenoRatio.correct) {
+                playTone('win');
+                addScore('step4', 5);
+                const isLast = state.missionIdx === MISSIONS.length - 1;
+                showFeedbackModal(true, `ผ่าน${m.badge.split('•')[0].trim()} สำเร็จ! (+5 คะแนน)`, `<strong>สรุปผลการทดลอง:</strong><br>• ${m.genoRatio.reason}<br>• ${m.phenoRatio.reason}`, () => {
+                    if (isLast) {
+                        showSummaryScreen();
+                    } else {
+                        loadMission(state.missionIdx + 1);
+                    }
+                });
+            } else {
+                playTone('err');
+                showFeedbackModal(false, "อัตราส่วนยังไม่ถูกต้อง ลองนับจากตารางด้านบนอีกครั้ง", `• ${m.genoRatio.reason}<br>• ${m.phenoRatio.reason}`, null);
+            }
+        }
+
+        // ==========================================
+        // 7. MODAL & FINAL SUMMARY
+        // ==========================================
+        function showFeedbackModal(isSuccess, title, bodyHtml, onNext) {
+            const modal = document.getElementById('feedback-modal');
+            const card = document.getElementById('modal-card');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const btn = document.getElementById('modal-btn');
+
+            card.className = `bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 animate-pop text-center ${isSuccess ? 'border-emerald-400' : 'border-rose-400'}`;
+            icon.className = `w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl ${isSuccess ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`;
+            icon.innerHTML = isSuccess ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+            titleEl.className = `font-prompt font-bold text-xl mb-2 ${isSuccess ? 'text-emerald-800' : 'text-rose-800'}`;
+            titleEl.textContent = title;
+            bodyEl.innerHTML = bodyHtml;
+
+            btn.className = `w-full py-3 rounded-xl font-prompt font-bold text-white shadow transition ${isSuccess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}`;
+            btn.textContent = isSuccess ? "ดำเนินการต่อ" : "ลองใหม่อีกครั้ง";
+            btn.onclick = () => {
+                modal.classList.add('hidden');
+                if (onNext) onNext();
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function showSummaryScreen() {
+            document.getElementById('screen-lab').classList.add('hidden');
+            document.getElementById('screen-summary').classList.remove('hidden');
+
+            document.getElementById('sum-student-info').textContent = `${state.studentName} (${state.studentClass}) • โรงเรียนบ่อทองวงษ์จันทร์วิทยา`;
+            document.getElementById('sum-total-score').textContent = `${state.totalScore} / 100`;
+
+            const skills = [
+                { label: "1. การระบุจีโนไทป์รุ่นพ่อแม่ (Parental Generation)", val: state.skillScores.step1, max: 25 },
+                { label: "2. การสร้างเซลล์สืบพันธุ์ตามกฎเมนเดล (Gametes)", val: state.skillScores.step2, max: 25 },
+                { label: "3. การผสมพันธุ์ในตารางพันเนต (Punnett Square)", val: state.skillScores.step3, max: 25 },
+                { label: "4. การวิเคราะห์อัตราส่วนรุ่นลูก (F₁ Ratios)", val: state.skillScores.step4, max: 25 }
+            ];
+
+            document.getElementById('sum-skills-bars').innerHTML = skills.map(sk => {
+                const pct = Math.round((sk.val / sk.max) * 100);
+                return `
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between text-xs sm:text-sm font-bold mb-1">
+                            <span class="text-slate-700">${sk.label}</span>
+                            <span class="text-emerald-700">${sk.val} / ${sk.max} คะแนน (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-emerald-500 to-amber-500 h-2.5 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // ⭐ ส่งคะแนนรวม (เต็ม 100) กลับไปยังเว็บแอปหลักทันทีที่หน้าสรุปผลปรากฏ
+            window.parent.postMessage({ type: 'GAME_SCORE', score: state.totalScore }, '*');
+        }
+
+        function restartWholeLab() {
+            playTone('click');
+            state.totalScore = 0;
+            state.skillScores = { step1: 0, step2: 0, step3: 0, step4: 0 };
+            updateScoreUI();
+            document.getElementById('screen-summary').classList.add('hidden');
+            document.getElementById('screen-lab').classList.remove('hidden');
+            loadMission(0);
+        }
+    </script>
+</body>
+</html>
